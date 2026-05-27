@@ -32,6 +32,5 @@ Echo of 8kB Internal RAM
 --------------------------- 0000 --
 * NOTE: b = bit, B = byte
 */
-
-
+	return 0;
 }

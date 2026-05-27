@@ -3,8 +3,9 @@
 #include<sys/stat.h>
 #include<sys/types.h>
 
-#include "cpu.h" // includes always just copy paste the code from the file
+//#include "cpu.h" // includes always just copy paste the code from the file
 #include "memory.h"
+#include "debug.h"
 
 off_t getsize(const char *filename){
 	// https://en.wikipedia.org/wiki/Stat_(system_call)
@@ -18,10 +19,15 @@ off_t getsize(const char *filename){
 }
 
 void loader(uint8_t* mem,unsigned char data,unsigned int offset){
-	//logmsg();
+	logmsg("loader",true,debug_flag);
 	*(mem + offset) = data;
+	logmsg("loader",false,debug_flag);
 }
 
+void decode(uint8_t* mem){
+
+
+}
 
 void read(){
 	unsigned char bytecode;
