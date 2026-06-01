@@ -34,3 +34,7 @@ Echo of 8kB Internal RAM
 */
 	return 0;
 }
+
+void loader(unsigned char data,unsigned int offset){
+	*(memory + offset) = data;
+}

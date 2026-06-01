@@ -1,29 +1,32 @@
 #include<stdbool.h>
 #include<stdio.h>
 
-#include "cpu.h"
 #include "memory.h"
 #include "debug.h"
 
-void logmsg(const char* function_name,bool start,bool debug_flag){
-	if(!debug_flag)
-		return;
+void logmsg(const char* function_name,bool start){
 
-	if(start)
-		printf("\n=====function %s START=====\n",function_name);
-	else
+	if(start){
+		dprintf(ANSI_COLOR_RED);
+		dprintf("\n=====function %s START=====\n",function_name);
+		dprintf(ANSI_COLOR_RESET);
+	}
+	else{
+		dprintf(ANSI_COLOR_RED);
 		printf("=====function %s END=====\n",function_name);
+		dprintf(ANSI_COLOR_RESET);
+	}
 }
 
 // View the memory locations from a starting address to an ending address
 void _memoryframe(short start,short end){
-	logmsg("_memoryframe",true,debug_flag);
+	logmsg("_memoryframe",true);
 
 	if(debug_flag)
 		for(short i = start; i <= end;i++)
 				printf("val is: 0x%02x at 0x%04x\n",(int) memory[i],(int) i);
 
-	logmsg("_memoryframe",false,debug_flag);
+	logmsg("_memoryframe",false);
 }
 
 void _fillopcode(){

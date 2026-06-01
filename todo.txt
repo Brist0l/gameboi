@@ -1,1 +1,2 @@
-=> continue with logmsg() in rom_disass.c in loader()
+=> make a memory dump to see the memory which is being edited 
+=> make 0xe2
