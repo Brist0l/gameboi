@@ -8,7 +8,8 @@ struct registers{
 	uint8_t A; // Accumulator and Flag
 	uint8_t B;// High register with B and lo with C
 	uint8_t C;// High register with B and lo with C
-	uint16_t DE; // High register with D and lo with E
+	uint8_t D; // High register with D and lo with E
+	uint8_t E; // High register with D and lo with E
 	uint8_t H; // High register with H and lo with L
 	uint8_t L; // High register with H and lo with L
 		   
@@ -32,6 +33,6 @@ struct registers{
 
 extern struct registers cpu; // an extern struct with the name "cpu"
 			     
-void execute(unsigned int file_size);
+void execute();
 
 #endif

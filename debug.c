@@ -29,6 +29,22 @@ void _memoryframe(short start,short end){
 	logmsg("_memoryframe",false);
 }
 
+// View the memory locations from a starting address to an ending address
+void _memorydump(int start,int end){
+	logmsg("_memorydump",true);
+	
+	if(debug_flag){
+		for(int i = start; i <= end;i++){
+			if(i % 16 == 0)
+				printf("\n%04x => ",i);
+			printf("%02x ",memory[i]);
+		}
+		printf("\n");
+	}
+
+	logmsg("_memorydump",false);
+}
+
 void _fillopcode(){
 	// Filling it with a const opcode , 00EE => basically it's C's `return`
 	// So all the opcodes are 2 bytes long and it's stored in big-endian format

@@ -24,5 +24,8 @@ int main(){
 	//_memoryframe(0x0,0x100); // from 0 to 256 bytes
 
 	while(cpu.PC != 0x32)
-		execute(size);
+		execute();
+	
+	_memorydump(0xff20,0xffff);
+
 }

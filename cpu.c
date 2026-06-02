@@ -105,7 +105,37 @@ int getC(){
 	return ((cpu.F & 0b00010000) >> 4);
 }
 
-void execute(unsigned int file_size){
+uint16_t getHL(){
+	return (cpu.H << 8) | cpu.L;
+}
+
+void setHL(uint16_t value){
+	unsigned short msb;
+	unsigned short lsb;
+
+	lsb = value & 0x00ff;
+	msb = (value & 0xff00) >> 8;
+
+	cpu.H = msb;
+	cpu.L = lsb;
+}
+
+uint16_t getDE(){
+	return (cpu.D << 8) | cpu.E;
+}
+
+void setDE(uint16_t value){
+	unsigned short msb;
+	unsigned short lsb;
+
+	lsb = value & 0x00ff;
+	msb = (value & 0xff00) >> 8;
+
+	cpu.D = msb;
+	cpu.E = lsb;
+}
+
+void execute(){
 	logmsg("execute",true);
 	unsigned short msb;
 	unsigned short lsb;
@@ -115,7 +145,6 @@ void execute(unsigned int file_size){
 	uint8_t addr;
 
 	uint16_t HL;
-
 
 	if(cpu.PC >= 0x00a8 && cpu.PC < 0x00e0){
 		dprintf(ANSI_COLOR_BLUE);
@@ -127,7 +156,6 @@ void execute(unsigned int file_size){
 	}
 
 	unsigned char opcode = memory[cpu.PC];
-	HL = (cpu.H << 8) | cpu.L;
 
 	//printf(ANSI_COLOR_RED);
 	//dprintf("0x%04x\t",i);
@@ -167,8 +195,14 @@ void execute(unsigned int file_size){
 		case 0x0c:
 			// INCREASE C
 			// lenght is 1 byte
+			// increase val of C by 1
 
-			printf("INC C\n");
+			dprintf("INC C\n");
+			dprintf("Value of Register C before: 0x%02x\n",cpu.C);
+
+			cpu.C++;
+
+			dprintf("Value of Register C after: 0x%02x\n",cpu.C);
 			break;
 
 		case 0x0d:
@@ -198,6 +232,7 @@ void execute(unsigned int file_size){
 		case 0x11:
 			// LOAD DE, u16
 			// lenght is 3 bytes
+			// store u16 in DE
 
 			lsb = memory[++cpu.PC];
 			dprintf("LSB: 0x%04x\n",lsb);
@@ -211,6 +246,12 @@ void execute(unsigned int file_size){
 			dprintf("u16: 0x%04x\n",u16);
 
 			printf("LD DE, 0x%04x\n",u16);
+
+			dprintf("Value of Register DE before: 0x%04x\n",getDE());
+
+			setDE(u16);
+
+			dprintf("Value of Register DE after: 0x%04x\n",getDE());
 
 			break;
 
@@ -303,8 +344,13 @@ void execute(unsigned int file_size){
 			dprintf("JR NZ, (0x%04x)\n",addr);
 			dprintf("Z : 0b%b\n",getz());
 
-			if(getz() == 0)
+			if(getz() == 0){
+				dprintf("Jumping to 0x%04x\n",addr);
 				cpu.PC = addr - 1; //as a +1 will happen after the end of switch case
+			}
+			else{
+				dprintf("Not Jumping\n");
+			}
 
 			break;
 
@@ -328,11 +374,11 @@ void execute(unsigned int file_size){
 
 			dprintf("LD HL, 0x%04x\n",u16);
 
-			dprintf("HL register before: 0x%04x\n",(cpu.H<< 8) | cpu.L);
-			cpu.H = msb;
-			cpu.L = lsb;
+			dprintf("HL register before: 0x%04x\n",getHL());
 
-			dprintf("HL register before: 0x%04x\n",(cpu.H<< 8) | cpu.L);
+			setHL(u16);
+
+			dprintf("HL register after: 0x%04x\n",getHL());
 
 
 			break;
@@ -439,26 +485,22 @@ void execute(unsigned int file_size){
 			// Put A into memory address HL and then decrement HL
 
 			dprintf("LD (HL-), A\n");
-			dprintf("HL Register before: 0x%04x\n",HL);
+			dprintf("HL Register before: 0x%04x\n",getHL());
 			dprintf("H Register before: 0x%04x\n",cpu.H);
 			dprintf("L Register before: 0x%04x\n",cpu.L);
-			dprintf("A Register before: 0x%02x\n",cpu.A);
-			dprintf("memory at HL before: 0x%02x\n",memory[HL]);
+			dprintf("Value of Register A : 0x%02x\n",cpu.A);
+			dprintf("memory at HL before: 0x%02x\n",memory[getHL()]);
+
+			HL = getHL();
 
 			memory[HL] = cpu.A;
 			HL--;
+			setHL(HL);
 
-			lsb = HL & 0x00ff;
-			msb = (HL & 0xff00) >> 8;
-
-			cpu.H = msb;
-			cpu.L = lsb;
-
-			dprintf("HL Register after: 0x%04x\n",HL);
+			dprintf("HL Register after: 0x%04x\n",getHL());
 			dprintf("H Register after: 0x%02x\n",cpu.H);
 			dprintf("L Register after: 0x%02x\n",cpu.L);
-			dprintf("A Register after: 0x%02x\n",cpu.A);
-			dprintf("memory at HL after: 0x%02x\n",memory[HL + 1]);
+			dprintf("memory at HL after: 0x%02x\n",memory[getHL() + 1]);
 
 			break;
 
@@ -492,7 +534,7 @@ void execute(unsigned int file_size){
 			// lenght is 2 bytes
 
 			dprintf("LD A, u8\n");
-			dprintf("Register A value before : 0x%04x\n",cpu.A);
+			dprintf("Register A value before : 0x%02x\n",cpu.A);
 
 			u8 = memory[++cpu.PC];
 			dprintf("u8: 0x%02x\n",u8);
@@ -501,7 +543,7 @@ void execute(unsigned int file_size){
 
 			cpu.A = u8;
 
-			dprintf("Register A value before : 0x%04x\n",cpu.A);
+			dprintf("Register A value after : 0x%02x\n",cpu.A);
 			break;
 
 		case 0x47:
@@ -535,9 +577,16 @@ void execute(unsigned int file_size){
 		case 0x77:
 			// LOAD (HL),A
 			// lenght is 1 byte
-			// put data of A into HL
+			// put data of A into memory of HL
 
-			printf("LD HL, A\n");
+			dprintf("LD HL, A\n");
+			dprintf("Value of Register HL : 0x%04x\n",getHL());
+			dprintf("Value of Register A : 0x%02x\n",cpu.A);
+			dprintf("before : 0x%02x is at 0x%04x\n",memory[getHL()],getHL());
+			memory[getHL()] = cpu.A;
+
+			dprintf("after : 0x%02x is at 0x%04x\n",memory[getHL()],getHL());
+
 			break;
 
 		case 0x78:
@@ -710,10 +759,18 @@ void execute(unsigned int file_size){
 			// lenght is 2 bytes
 			// Put A into addr of val u8+ 0xff00
 
+			dprintf("LD (FF00 + u8),A\n");
+
 			u8 = memory[++cpu.PC];
 			dprintf("u8: 0x%02x\n",u8);
 
-			printf("LD (0xff00 + 0x%02x),A\n",u8);
+			addr = 0xff00 + u8;
+			dprintf("LD (0xff00 + 0x%02x),A\n",u8);
+			dprintf("before : 0x%02x is at 0x%04x\n",memory[addr],addr);
+
+			memory[addr] = cpu.A;
+			dprintf("after : 0x%02x is at 0x%04x\n",memory[addr],addr);
+
 			break;
 
 		case 0xe2:
@@ -721,7 +778,9 @@ void execute(unsigned int file_size){
 			// lenght is 1 byte
 			// Put A into addr of val at C + 0xff00
 
-			printf("LD (0xff00 + C),A\n");
+			dprintf("LD (0xff00 + C),A\n");
+			dprintf("Putting 0x%02x at 0x%04x\n",cpu.A,cpu.C + 0xff00);
+			memory[cpu.C + 0xff00] = cpu.A;
 
 			break;
 
