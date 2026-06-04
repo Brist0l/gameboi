@@ -21,11 +21,16 @@ int main(){
 	dprintf("dmg_boot ROM size: %d\n",size);
 	load_rom("dmg_boot.bin",size,0);
 
-	//_memoryframe(0x0,0x100); // from 0 to 256 bytes
+	memory[0xff44] = 0x90; //  Just to pass the infinite loop
 
-	while(cpu.PC != 0x32)
+	//_memoryframe(0x0,0x100); // from 0 to 256 bytes
+	int cnt = 0xffff;
+
+	while(cpu.PC <= 0x00ff)
+	//while(cnt-- != 0)
 		execute();
 	
 	_memorydump(0xff20,0xffff);
+	_memorydump(0x8000,0x8080);
 
 }

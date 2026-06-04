@@ -4,6 +4,7 @@
 #include "memory.h"
 #include "debug.h"
 
+
 void logmsg(const char* function_name,bool start){
 
 	if(start){

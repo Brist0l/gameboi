@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<stdint.h>
+#include<unistd.h>
 
 #include "cpu.h"
 #include "memory.h"
@@ -31,7 +32,7 @@ struct registers cpu;
 // 0b01010101 => 0b01010101
 // 0b11010101 => 0b01010101
 void setz(const unsigned short val){
-	dprintf("Register value F before setting Z to %b : 0b%08b\n",val,cpu.F);
+	dprintf("Register value F before setting Z to %b: 0b%08b\n",val,cpu.F);
 
 	unsigned short restofbits = cpu.F & GETZFLG;
 
@@ -135,6 +136,21 @@ void setDE(uint16_t value){
 	cpu.E = lsb;
 }
 
+uint16_t getBC(){
+	return (cpu.B << 8) | cpu.C;
+}
+
+void setBC(uint16_t value){
+	unsigned short msb;
+	unsigned short lsb;
+
+	lsb = value & 0x00ff;
+	msb = (value & 0xff00) >> 8;
+
+	cpu.B = msb;
+	cpu.C = lsb;
+}
+
 void execute(){
 	logmsg("execute",true);
 	unsigned short msb;
@@ -145,6 +161,7 @@ void execute(){
 	uint8_t addr;
 
 	uint16_t HL;
+	uint16_t BC;
 
 	if(cpu.PC >= 0x00a8 && cpu.PC < 0x00e0){
 		dprintf(ANSI_COLOR_BLUE);
@@ -171,24 +188,45 @@ void execute(){
 			// INC B
 			// lenght is 1 byte
 
-			printf("INC B\n");
+			dprintf("INC B\n");
+			dprintf("Value of register B before is: 0x%04x\n",cpu.B);
+			cpu.B++;
+			dprintf("Value of register B after is: 0x%04x\n",cpu.B);
 			break;
 
 		case 0x05:
 			// DEC B
 			// lenght is 1 byte
 
-			printf("DEC B\n");
+			dprintf("DEC B\n");
+
+			dprintf("Value of register B before is: 0x%02x\n",cpu.B);
+
+			cpu.B--;
+
+			if(cpu.B == 0)
+				setz(1);
+			else
+				setz(0);
+
+			dprintf("Value of register B after is: 0x%02x\n",cpu.B);
 			break;
 
 		case 0x06:
 			// LOAD B,u8
 			// lenght is 2 bytes
+			// Put u8 into B
 
 			u8 = memory[++cpu.PC];
 			dprintf("u8: 0x%02x\n",u8);
 
-			printf("LD B, 0x%02x\n",u8);
+			dprintf("LD B, 0x%02x\n",u8);
+			dprintf("Value of Register B before: 0x%02x\n",cpu.B);
+
+			cpu.B = u8;
+
+			dprintf("Value of Register B before: 0x%02x\n",cpu.B);
+
 			break;
 
 
@@ -208,7 +246,13 @@ void execute(){
 		case 0x0d:
 			// DECREASE C
 			// lenght is 1 byte
-			printf("DEC C\n");
+
+			dprintf("DEC C\n");
+			dprintf("Value of register C before is: 0x%04x\n",cpu.C);
+			cpu.C--;
+			dprintf("Value of register C after is: 0x%04x\n",cpu.C);
+
+			//sleep(1);
 			break;
 
 		case 0x0e:
@@ -226,6 +270,8 @@ void execute(){
 
 			cpu.C = u8;
 			dprintf("Register C value after : 0x%02x\n",cpu.C);
+
+			//sleep(5);
 
 			break;
 
@@ -245,7 +291,7 @@ void execute(){
 			u16 = (msb << 8) | lsb;
 			dprintf("u16: 0x%04x\n",u16);
 
-			printf("LD DE, 0x%04x\n",u16);
+			dprintf("LD DE, 0x%04x\n",u16);
 
 			dprintf("Value of Register DE before: 0x%04x\n",getDE());
 
@@ -259,14 +305,33 @@ void execute(){
 			// INC DE
 			// lenght is 1 byte
 
-			printf("INC DE\n");
+			dprintf("INC DE\n");
+
+			dprintf("Value of Register DE before: 0x%04x\n",getDE());
+
+			setDE(getDE() + 1);
+
+			dprintf("Value of Register DE after: 0x%04x\n",getDE());
+
+
 			break;
 
 		case 0x15:
 			// DEC D
 			// lenght is 1 byte
 
-			printf("DEC D\n");
+			dprintf("DEC D\n");
+
+			dprintf("Value of register D before is: 0x%02x\n",cpu.D);
+
+			cpu.D--;
+
+			if(cpu.D == 0)
+				setz(1);
+			else
+				setz(0);
+
+			dprintf("Value of register D after is: 0x%02x\n",cpu.D);
 			break;
 
 		case 0x16:
@@ -282,8 +347,24 @@ void execute(){
 		case 0x17:
 			// RLA
 			// lenght is 1 byte
+			// Same as RLC but Z flag always 0
 
-			printf("RLA\n");
+			dprintf("RLA\n");
+
+			dprintf("C Flag before is: 0b%b\n",getC());
+			dprintf("Register A before is: 0x%2x\n",cpu.A);
+			dprintf("Register A before is: 0b%b\n",cpu.A);
+
+			lsb = getC();
+			setc(cpu.C >> 7);
+
+			cpu.A <<= 1;
+			cpu.A = lsb | cpu.A ;
+
+			dprintf("C Flag after is: 0b%b\n",getC());
+			dprintf("Register A after is: 0x%2x\n",cpu.A);
+			dprintf("Register A after is: 0b%b\n",cpu.A);
+
 			break;
 
 		case 0x18:
@@ -296,25 +377,46 @@ void execute(){
 			dprintf("Add by: %d\n",addr);
 
 			addr += cpu.PC + 1; // address is calculated after the instruction hence
-				     // the +1
+				     	   // the +1
 			dprintf("Address is: 0x%04x\n",addr);
 
-			printf("JR (0x%04x)\n",addr);
+			dprintf("JR (0x%04x)\n",addr);
+
+			cpu.PC = addr - 1;
 
 			break;
 
 		case 0x1a:
 			// LOAD A,(DE)
 			// lenght is 1 byte
+			// put contents at addr specified by DE into A
 
 			printf("LD A, (DE)\n");
+			printf("Value of Register DE is: 0x%04x\n",getDE());
+			printf("Value of Register A before is: 0x%02x\n",cpu.A);
+			printf("Value at 0x%04x is: 0x%02x\n",getDE(),memory[getDE()]);
+
+			cpu.A = memory[getDE()];
+
+			printf("Value of Register A after is: 0x%02x\n",cpu.A);
+
 			break;
 
 		case 0x1d:
 			// DECREASE E
 			// lenght is 1 byte
 
-			printf("DEC E\n");
+			dprintf("DEC E\n");
+			dprintf("Value of register E before is: 0x%02x\n",cpu.E);
+
+			cpu.E--;
+
+			if(cpu.E == 0)
+				setz(1);
+			else
+				setz(0);
+
+			dprintf("Value of register D after is: 0x%02x\n",cpu.E);
 			break;
 
 		case 0x1e:
@@ -324,7 +426,13 @@ void execute(){
 			u8 = memory[++cpu.PC];
 			dprintf("u8: 0x%02x\n",u8);
 
-			printf("LD E, 0x%02x\n",u8);
+			dprintf("LD E, 0x%02x\n",u8);
+
+			dprintf("Register E value before : 0x%02x\n",cpu.E);
+
+			cpu.E = u8;
+
+			dprintf("Register E value after : 0x%02x\n",cpu.E);
 			break;
 
 		case 0x20:
@@ -336,6 +444,7 @@ void execute(){
 			dprintf("JR NZ, u8\n");
 
 			addr = memory[++cpu.PC];
+
 			dprintf("Add by(u8) : 0x%2x (0d%d) \n",addr,addr);
 
 			addr += cpu.PC + 1; // address is calculated after the instruction hence
@@ -352,6 +461,8 @@ void execute(){
 				dprintf("Not Jumping\n");
 			}
 
+			//sleep(1);
+
 			break;
 
 		case 0x21:
@@ -361,6 +472,7 @@ void execute(){
 			// Put u16's msb in H and lsb in L
 
 			dprintf("LD HL, u16\n");
+
 			lsb = memory[++cpu.PC];
 			dprintf("LSB: 0x%04x\n",lsb);
 			dprintf("LSB: 0b%b\n",lsb);
@@ -386,17 +498,49 @@ void execute(){
 		case 0x22:
 			// LOAD (HL+),A
 			// lenght is 1 byte
-			// put data of A at the memoryory location of HL and
+			// put data of A at the memory location of HL and
 			// increment HL
 
-			printf("LD (HL+), A\n");
+			dprintf("LD (HL+), A\n");
+
+			dprintf("HL Register before: 0x%04x\n",getHL());
+			dprintf("H Register before: 0x%02x\n",cpu.H);
+			dprintf("L Register before: 0x%02x\n",cpu.L);
+			dprintf("Value of Register A : 0x%02x\n",cpu.A);
+			dprintf("memory at HL before: 0x%02x\n",memory[getHL()]);
+
+			HL = getHL();
+
+			memory[HL] = cpu.A;
+			HL++;
+			setHL(HL);
+
+			dprintf("HL Register after: 0x%04x\n",getHL());
+			dprintf("H Register after: 0x%02x\n",cpu.H);
+			dprintf("L Register after: 0x%02x\n",cpu.L);
+			dprintf("memory at HL after: 0x%02x\n",memory[getHL() - 1]);
+
 			break;
 
 		case 0x23:
 			// INC HL
 			// lenght is 1 byte
+			// Add 1 to HL
 
-			printf("INC HL\n");
+			dprintf("INC HL\n");
+
+			dprintf("HL Register before: 0x%04x\n",getHL());
+			dprintf("H Register before: 0x%02x\n",cpu.H);
+			dprintf("L Register before: 0x%02x\n",cpu.L);
+
+			HL = getHL();
+			HL++;
+			setHL(HL);
+
+			dprintf("HL Register after: 0x%04x\n",getHL());
+			dprintf("H Register after: 0x%02x\n",cpu.H);
+			dprintf("L Register after: 0x%02x\n",cpu.L);
+
 			break;
 
 		case 0x24:
@@ -408,29 +552,48 @@ void execute(){
 
 		case 0x28:
 			// JR Z, u8
-			// JUMP if Zero to (current addr + n)
+			// JUMP if Zero flag is 1 to (current addr + n)
 			// lenght is 2 bytes
 
 			addr = memory[++cpu.PC];
+
 			dprintf("Add by: 0x%2x\n",addr);
 			dprintf("Add by: %d\n",addr);
 
 			addr += cpu.PC + 1; // address is calculated after the instruction hence
-				     // the +1
+				     	   // the +1
 			dprintf("Address is: 0x%04x\n",addr);
 
-			printf("JR Z, (0x%04x)\n",addr);
+
+			dprintf("Address is: 0x%04x\n",addr);
+			dprintf("JR Z, (0x%04x)\n",addr);
+			dprintf("Z : 0b%b\n",getz());
+
+			if(getz() == 1){
+				dprintf("Jumping to 0x%04x\n",addr);
+				cpu.PC = addr - 1; //as a +1 will happen after the end of switch case
+			}
+			else{
+				dprintf("Not Jumping\n");
+			}
 
 			break;
 
 		case 0x2e:
 			// LOAD L , u8
 			// lenght is 2 bytes
+			// Put the value of u8 in the L register
 
 			u8 = memory[++cpu.PC];
 			dprintf("u8: 0x%02x\n",u8);
 
-			printf("LD L, 0x%02x\n",u8);
+			dprintf("LD L, 0x%02x\n",u8);
+			dprintf("Value of register L before : 0x%02x\n",cpu.L);
+
+			cpu.L = u8;
+
+			dprintf("Value of register L after : 0x%02x\n",cpu.L);
+
 			break;
 
 		case 0x30:
@@ -525,7 +688,18 @@ void execute(){
 			// DEC A
 			// lenght is 1 byte
 
-			printf("DEC A\n");
+			dprintf("DEC A\n");
+
+			dprintf("Value of register A before is: 0x%02x\n",cpu.A);
+
+			cpu.A--;
+
+			if(cpu.A == 0)
+				setz(1);
+			else
+				setz(0);
+
+			dprintf("Value of register A after is: 0x%02x\n",cpu.A);
 
 			break;
 
@@ -556,22 +730,46 @@ void execute(){
 		case 0x4f:
 			// LOAD C,A
 			// lenght is 1 byte
+			// Put value of A into C
 
-			printf("LD C, A\n");
+			dprintf("LD C, A\n");
+			dprintf("Register C value before : 0x%02x\n",cpu.C);
+			dprintf("Register A value : 0x%02x\n",cpu.A);
+
+			cpu.C = cpu.A;
+
+			dprintf("Register C value after : 0x%02x\n",cpu.C);
+
 			break;
 
 		case 0x57:
 			// LOAD D,A
 			// lenght is 1 byte
 
-			printf("LD D, A\n");
+			dprintf("LD D, A\n");
+
+			dprintf("Register D value before : 0x%02x\n",cpu.D);
+			dprintf("Register A value : 0x%02x\n",cpu.A);
+
+			cpu.D = cpu.A;
+
+			dprintf("Register H value after : 0x%02x\n",cpu.D);
+
 			break;
 
 		case 0x67:
 			// LOAD H,A
 			// lenght is 1 byte
+			// Put the contents of A into the H register
 
-			printf("LD H, A\n");
+			dprintf("LD H, A\n");
+			dprintf("Register H value before : 0x%02x\n",cpu.H);
+			dprintf("Register A value : 0x%02x\n",cpu.A);
+
+			cpu.H = cpu.A;
+
+			dprintf("Register H value after : 0x%02x\n",cpu.H);
+
 			break;
 
 		case 0x77:
@@ -596,15 +794,31 @@ void execute(){
 		case 0x7b:
 			// LOAD A,E
 			// lenght is 1 byte
+			// Put contents of E into A
 
-			printf("LD A, E\n");
+			dprintf("LD A, E\n");
+
+			dprintf("Register A value before : 0x%02x\n",cpu.A);
+			dprintf("Register E value : 0x%02x\n",cpu.E);
+
+			cpu.A = cpu.E;
+
+			dprintf("Register A value after : 0x%02x\n",cpu.A);
+
 			break;
 
 		case 0x7c:
 			// LOAD A,H
 			// lenght is 1 byte
+			// Put contents of H into A
 
-			printf("LD A, H\n");
+			dprintf("LD A, H\n");
+			dprintf("Register A value before : 0x%02x\n",cpu.A);
+			dprintf("Register H value : 0x%02x\n",cpu.H);
+
+			cpu.A = cpu.H;
+
+			dprintf("Register A value after : 0x%02x\n",cpu.A);
 			break;
 
 		case 0x7D:
@@ -624,8 +838,15 @@ void execute(){
 			// lenght is 1 byte
 			// subtract B from A
 
-			printf("SUB B\n");
+			dprintf("SUB B\n");
+			dprintf("Value of register A before : 0x%02x\n",cpu.A);
+			dprintf("Value of register B : 0x%02x\n",cpu.B);
+
+			cpu.A -= cpu.B;
+
+			dprintf("Value of register A after : 0x%02x\n",cpu.A);
 			break;
+
 
 		case 0xaf:
 			// XOR A
@@ -641,14 +862,45 @@ void execute(){
 			break;
 
 		case 0xbe:
-			printf("CP A, (HL)\n");
+			// COMPARE A , (HL)
+			// Same as CP u8 but this time compare with the content
+			// at the addr (HL)
+			// Basically sets flag after A-memory[HL] and throws away the result
+			// So if A == memory[HL] then A - memory[HL] is 0
+			// hence ,
+			// Z = 1
+
+			dprintf("CP A, (HL)\n");
+			dprintf("Value of Register HL is: 0x%04x\n",getHL());
+			dprintf("Value of Register A is: 0x%04x\n",cpu.A);
+			dprintf("Value at 0x%04x is: 0x%04x\n",getHL(),memory[getHL()]);
+
+			if(cpu.A - memory[getHL()] == 0){
+				dprintf("Setting Zero flag to 1\n");
+				setz(1);
+			}else{
+				dprintf("Setting Zero flag to 0\n");
+				setz(0);
+			}
+
 			break;
 
 		case 0xc1:
 			// POP BC
 			// lenght is 1 byte
 
-			printf("POP BC\n");
+			dprintf("POP BC\n");
+			dprintf("SP before: 0x%04x\n",cpu.SP);
+
+			lsb = pop(); // C
+			msb = pop();  // B
+
+			u16 = (msb << 8) | lsb;
+
+			setBC(u16);
+
+			dprintf("Value of register BC : 0x%04x\n",getBC());
+			dprintf("SP after: 0x%04x\n",cpu.SP);
 
 			break;
 
@@ -659,20 +911,56 @@ void execute(){
 			// PUSH's the value which is in BC
 			// and decrements the SP twice
 
-			printf("PUSH BC\n");
+			dprintf("PUSH BC\n");
+
+			BC = getBC();
+
+			dprintf("SP val before: 0x%04x\n",cpu.SP);
+			dprintf("Value of Register BC is 0x%04x\n",BC);
+
+			lsb = BC & 0x00ff; 	  // C
+			msb = (BC & 0xff00) >> 8; // B
+
+			push(msb);
+			push(lsb);
+
+			dprintf("Pushed 0x%02x to stack\n",lsb);
+			dprintf("Pushed 0x%02x to stack\n",msb);
+
+			dprintf("stack: \n0x%02x\n0x%02x\n",msb,lsb);
+
+			dprintf("Pushed 0x%04x to stack\n",BC);
+			dprintf("SP val after: 0x%04x\n",cpu.SP);
 
 			break;
 
 		case 0xc9:
 			// RET
 			// lenght is 1 byte
+			// POP the stack and put it into the PC
 
-			printf("RET\n");
+			dprintf("RET\n");
+			dprintf("SP before: 0x%04x\n",cpu.SP);
+
+			lsb = pop(); // P of the PC
+			msb = pop();  // C of the PC
+
+			u16 = (msb << 8) | lsb;
+
+			cpu.PC = u16;
+
+			dprintf("Value of register PC : 0x%04x\n",cpu.PC + 1);
+			dprintf("SP after: 0x%04x\n",cpu.SP);
 
 			break;
 
 		case 0xcb:
 			// PREFIX CB
+			// the zero flag is dependent
+			// zero = depends , set 1 if result is 0
+			// N = 0
+			// H = 0
+			// C = old
 
 			unsigned int nxtbyt = memory[++cpu.PC];
 
@@ -680,8 +968,31 @@ void execute(){
 				case 0x11:
 					// RL C
 					// lenght is 2 bytes
+					// Shift the value in C by 1
+					// and put carry flag value in
+					// the LSB and copy the shifted
+					// out bit to the carry flag
 
-					printf("RL C\n");
+					dprintf("RL C\n");
+
+					dprintf("C Flag before is: 0b%b\n",getC());
+					dprintf("Z Flag before is: 0b%b\n",getz());
+					dprintf("Register C before is: 0x%2x\n",cpu.C);
+					dprintf("Register C before is: 0b%b\n",cpu.C);
+
+					lsb = getC();
+					setc(cpu.C >> 7);
+
+					cpu.C <<= 1;
+					cpu.C = lsb | cpu.C ;
+
+					setz(cpu.C == 0);
+
+					dprintf("C Flag after is: 0b%b\n",getC());
+					dprintf("Z Flag after is: 0b%b\n",getz());
+					dprintf("Register C after is: 0x%2x\n",cpu.C);
+					dprintf("Register C after is: 0b%b\n",cpu.C);
+
 					break;
 
 				case 0x4f:
@@ -725,6 +1036,7 @@ void execute(){
 			}
 
 			break;
+
 		case 0xcd:
 			// CALL u16
 			// lenght is 3 bytes
@@ -740,7 +1052,20 @@ void execute(){
 			u16 = (msb << 8) | lsb;
 			dprintf("u16: 0x%04x\n",u16);
 
-			printf("CALL 0x%04x\n",u16);
+			//store the current addr to the stack
+			lsb = cpu.PC & 0x00ff;
+			msb = (cpu.PC & 0xff00) >> 8;
+
+			dprintf("Storing 0x%04x first\n",msb);
+			push(msb);
+			dprintf("Storing 0x%04x next\n",lsb);
+			push(lsb);
+
+			cpu.PC = u16 - 1; // +1 will be done at the end
+
+			dprintf("CALL 0x%04x\n",u16);
+
+			dprintf("Jumping to 0x%04x\n",u16);
 
 			break;
 
@@ -797,6 +1122,7 @@ void execute(){
 		case 0xea:
 			// LD u16, A
 			// lenght is 3 bytes
+			// store the value of A at memory address u16
 
 			lsb = memory[++cpu.PC];
 			dprintf("LSB: 0x%04x\n",lsb);
@@ -809,19 +1135,36 @@ void execute(){
 			u16 = (msb << 8) | lsb;
 			dprintf("u16: 0x%04x\n",u16);
 
-			printf("LD 0x%04x, A\n",u16);
+			dprintf("LD 0x%04x, A\n",u16);
+
+			dprintf("Storing 0x%02x at 0x%04x\n",cpu.A,u16);
+
+			dprintf("Value at 0x%04x before: 0x%02x\n",u16,memory[u16]);
+
+			memory[u16] = cpu.A;
+
+			dprintf("Value at 0x%04x after: 0x%02x\n",u16,memory[u16]);
 
 			break;
 
 		case 0xf0:
 			// LOAD A , (0xFF00 + u8)
 			// lenght is 2 bytes
-			// put the memory addr (0xff00 + u8) into A
+			// put the values from the memory addr (0xff00 + u8) into A
 
 			u8 = memory[++cpu.PC];
 			dprintf("u8: 0x%02x\n",u8);
 
-			printf("LD A, (0xff00 + 0x%02x),A\n",u8);
+			dprintf("LD A, (0xff00 + 0x%02x)\n",u8);
+
+			u16 = 0xff00 + u8;
+
+			dprintf("Memory 0x%04x has 0x%02x\n",u16,memory[u16]);
+			dprintf("Value of Register A before: 0x%02x\n",cpu.A);
+
+			cpu.A = memory[u16];
+
+			dprintf("Value of Register A before: 0x%02x\n",cpu.A);
 
 			break;
 
@@ -836,14 +1179,29 @@ void execute(){
 			break;
 
 		case 0xfe:
-			// COMPARE A,u8
+			// COMPARE A, u8
 			// lenght is 2 bytes
 			// Basically sets flag after A-u8 and throws away the result
+			// So if A == u8 then A - u8 is 0
+			// hence ,
+			// Z = 1
+			//
 
 			u8 = memory[++cpu.PC];
 			dprintf("u8: 0x%02x\n",u8);
 
-			printf("CP 0x%02x\n",u8);
+			dprintf("CP A, 0x%02x\n",u8);
+
+			if(cpu.A - u8 == 0){
+				dprintf("Setting Zero flag to 1\n");
+				setz(1);
+			}else{
+				dprintf("Setting Zero flag to 0\n");
+				setz(0);
+			}
+
+			//sleep(1);
+
 			break;
 
 		default:

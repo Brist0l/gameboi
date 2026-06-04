@@ -1,8 +1,8 @@
 #include<stdint.h>
 
-uint8_t memory[0xFFFF];
+#include"cpu.h"
 
-int mem(){
+uint8_t memory[0xFFFF];
 
 /*
 
@@ -32,9 +32,17 @@ Echo of 8kB Internal RAM
 --------------------------- 0000 --
 * NOTE: b = bit, B = byte
 */
-	return 0;
-}
 
 void loader(unsigned char data,unsigned int offset){
 	*(memory + offset) = data;
+}
+
+// Over here SP is the top so I would need to subtract first and then 
+// store as if I don't then overflow is happening.
+void push(uint8_t value){
+	memory[--cpu.SP] = value;
+}
+
+uint8_t pop(){
+	return memory[cpu.SP++];
 }

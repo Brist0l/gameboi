@@ -3,7 +3,6 @@
 
 #include<stdint.h>
 
-
 struct registers{
 	uint8_t A; // Accumulator and Flag
 	uint8_t B;// High register with B and lo with C
