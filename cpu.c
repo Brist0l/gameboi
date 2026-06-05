@@ -29,7 +29,7 @@ struct registers cpu;
 // 0b11010101 => 0b11010101
 //
 // if val = 0:
-// 0b01010101 => 0b01010101
+
 // 0b11010101 => 0b01010101
 void setz(const unsigned short val){
 	dprintf("Register value F before setting Z to %b: 0b%08b\n",val,cpu.F);
@@ -788,7 +788,18 @@ void execute(){
 			break;
 
 		case 0x78:
-			printf("LD A, B\n");
+			// LOAD A,B
+			// lenght is 1 byte
+			// Put contents of B into A
+			
+			dprintf("LD A, B\n");
+			dprintf("Register A value before : 0x%02x\n",cpu.A);
+			dprintf("Register B value : 0x%02x\n",cpu.B);
+
+			cpu.A = cpu.B;
+
+			dprintf("Register A value after : 0x%02x\n",cpu.A);
+
 			break;
 
 		case 0x7b:
@@ -821,16 +832,36 @@ void execute(){
 			dprintf("Register A value after : 0x%02x\n",cpu.A);
 			break;
 
-		case 0x7D:
-			printf("LD A, L\n");
+		case 0x7d:
+			// LOAD A ,L
+			// lenght is 1 byte
+			// Put contents of L into A
+			
+			dprintf("LD A, L\n");
+			dprintf("Register A value before : 0x%02x\n",cpu.A);
+			dprintf("Register L value : 0x%02x\n",cpu.L);
+
+			cpu.A = cpu.L;
+
+			dprintf("Register A value after : 0x%02x\n",cpu.A);
+			
 			break;
 
 		case 0x86:
 			// ADD A,(HL)
 			// lenght is 1 byte
-			// add value in HL to A
+			// add value at the addr HL to A
+			// and store in A
 
-			printf("ADD A, (HL)\n");
+			dprintf("ADD A, (HL)\n");
+			dprintf("Value of Register HL : 0x%04x\n",getHL());
+			dprintf("Value of Register A before: 0x%02x\n",cpu.A);
+			dprintf("0x%02x is at 0x%04x\n",memory[getHL()],getHL());
+
+			cpu.A += memory[getHL()];
+
+			dprintf("Value of Register A after: 0x%02x\n",cpu.A);
+
 			break;
 
 		case 0x90:

@@ -30,16 +30,45 @@ void load_rom(const char *filename,unsigned int size,unsigned short offset){
 
 		*(memory + offset + byt_cnt) = bytecode;
 
-		dprintf(ANSI_COLOR_YELLOW);
-		dprintf("%02x ",bytecode);
-		dprintf(ANSI_COLOR_RESET);
+		byt_cnt++;
 
-		if(++byt_cnt % 32 == 0)
-			dprintf("\n");
+		//dprintf(ANSI_COLOR_YELLOW);
+		//dprintf("%02x ",bytecode);
+		//dprintf(ANSI_COLOR_RESET);
+
+		//if(++byt_cnt % 32 == 0)
+			//dprintf("\n");
 
 	}
 
-	dprintf("\n");
+	//dprintf("\n");
+
+	fclose(rom_file);
+}
+
+void overwrite(const char *filename,unsigned int size,unsigned short offset){
+	unsigned char bytecode;
+
+	unsigned int byt_cnt = 0;
+	FILE* rom_file = fopen(filename,"rb");
+
+	while(byt_cnt != size){
+		bytecode = fgetc(rom_file);
+
+		*(memory + offset + byt_cnt) = bytecode;
+
+		byt_cnt++;
+
+		//dprintf(ANSI_COLOR_YELLOW);
+		//dprintf("%02x ",bytecode);
+		//dprintf(ANSI_COLOR_RESET);
+
+		//if(++byt_cnt % 32 == 0)
+			//dprintf("\n");
+
+	}
+
+	//dprintf("\n");
 
 	fclose(rom_file);
 }
