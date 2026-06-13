@@ -1,10 +1,11 @@
 #include<stdint.h>
+#include<stdio.h>
 
 #include"cpu.h"
 
 uint8_t memory[0xFFFF];
 
-/* 
+/*
  * From TCAGBD , 2. Memory
 Addresses 	Name 	Description
 0000h – 3FFFh 	ROM0 	Non-switchable ROM Bank.
@@ -55,7 +56,7 @@ void loader(unsigned char data,unsigned int offset){
 	*(memory + offset) = data;
 }
 
-// Over here SP is the top so I would need to subtract first and then 
+// Over here SP is the top so I would need to subtract first and then
 // store as if I don't then overflow is happening.
 void push(uint8_t value){
 	memory[--cpu.SP] = value;
@@ -63,4 +64,28 @@ void push(uint8_t value){
 
 uint8_t pop(){
 	return memory[cpu.SP++];
+}
+
+void memory_write(uint16_t mem_addr,uint8_t val){
+	char serial_data;
+
+	//if(mem_addr == 0xff01)
+        	//serial_data = val;
+
+    	//if(mem_addr == 0xff02 && val == 0x81)
+        	//printf("Serial IO: %c\n",serial_data);
+
+	//if(mem_addr >= 0x9900 && mem_addr <= 0x9940)
+	    //printf("WRITE 0x%04x = 0x%02x\n",mem_addr,val);
+
+	memory[mem_addr] = val;
+}
+
+uint8_t memory_read(uint16_t mem_addr){
+	if(mem_addr == 0xff44){
+	    //printf("READ %04x\n",mem_addr);
+	    return 0x90;
+	}
+
+	return memory[mem_addr];
 }

@@ -12,9 +12,15 @@
             printf(__VA_ARGS__);    \
     } while (0)
 
+#define pprintf(...)            \
+    do {                            \
+        if (print_mode)             \
+            printf(__VA_ARGS__);    \
+    } while (0)
 
 uint8_t memory[0xffff];
 bool debug_flag = false;
+bool print_mode = true;
 
 off_t getsize(const char *filename){
 	// https://en.wikipedia.org/wiki/Stat_(system_call)
@@ -31,7 +37,7 @@ void loader(uint8_t* mem,unsigned char data,unsigned int offset){
 	*(mem + offset) = data;
 }
 
-void decode(uint8_t* mem,unsigned int file_size){
+void decode(uint8_t* mem,unsigned int file_size,unsigned int offset){
 	unsigned short msb;
 	unsigned short lsb;
 	unsigned short u16;
@@ -39,30 +45,34 @@ void decode(uint8_t* mem,unsigned int file_size){
 	uint8_t addr;
 
 
-	printf(ANSI_COLOR_MAGENTA);
+	pprintf(ANSI_COLOR_MAGENTA);
 	printf("Disassembly:\n");
-	printf(ANSI_COLOR_RESET);
+	pprintf(ANSI_COLOR_RESET);
 
-	for(short i = 0; i < file_size;i++){
+	for(short i = offset; i < file_size;i++){
 		if(i >= 0x00a8 && i < 0x00e0){
-			printf(ANSI_COLOR_BLUE);
+			pprintf(ANSI_COLOR_BLUE);
 			printf(".DB:\t");
-			printf(ANSI_COLOR_RESET);
-			printf(ANSI_COLOR_GREEN);
+			pprintf(ANSI_COLOR_RESET);
+			pprintf(ANSI_COLOR_GREEN);
 			printf("0x%02x\n",*(mem + i));
-			printf(ANSI_COLOR_RESET);
+			pprintf(ANSI_COLOR_RESET);
 
 			continue;
 		}
 
 		unsigned char opcode = *(mem + i);
 
-		printf(ANSI_COLOR_RED);
+		pprintf(ANSI_COLOR_RED);
 		printf("0x%04x\t",i);
-		printf(ANSI_COLOR_RESET);
+		pprintf(ANSI_COLOR_RESET);
 
-		printf(ANSI_COLOR_GREEN);
+		pprintf(ANSI_COLOR_GREEN);
 		switch(opcode){
+			case 0x0:
+				printf("NOP\n");
+
+				break;
 			case 0x04:
 				// INC B
 				// lenght is 1 byte
@@ -631,7 +641,7 @@ void decode(uint8_t* mem,unsigned int file_size){
 				break;
 
 			default:
-				printf("\n");
+				printf("0x%02x\n",opcode);
 				break;
 
 		}
@@ -639,9 +649,9 @@ void decode(uint8_t* mem,unsigned int file_size){
 	}
 }
 
-int read(){
+int read(const char *filename){
 	unsigned char bytecode;
-	const char *filename = "dmg_boot.bin";
+	//const char *filename = "dmg_boot.bin";
 
 	unsigned int byt_cnt = 0;
 	unsigned int size = getsize(filename);
@@ -653,9 +663,9 @@ int read(){
 		bytecode = fgetc(rom_file);
 		loader(memory,bytecode,byt_cnt++);
 
-		printf(ANSI_COLOR_YELLOW);
+		pprintf(ANSI_COLOR_YELLOW);
 		printf("%02x ",bytecode);
-		printf(ANSI_COLOR_RESET);
+		pprintf(ANSI_COLOR_RESET);
 
 		if(byt_cnt % 32 == 0)
 			printf("\n");
@@ -667,12 +677,12 @@ int read(){
 	return size;
 }
 
-int main(){
-	int size = read();
-	decode(memory,size);
+int main(int argc,char** argv){
+	int size = read(argv[1]);
+	decode(memory,0x200,0x100);
 
-	printf(ANSI_COLOR_MAGENTA);
+	pprintf(ANSI_COLOR_MAGENTA);
 	printf("\n== END OF DISASSEMBLY ==\n");
-	printf(ANSI_COLOR_RESET);
+	pprintf(ANSI_COLOR_RESET);
 
 }

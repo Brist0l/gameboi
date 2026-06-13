@@ -1,2 +1,5 @@
 [Gameboy_bootstrap_ROM] => https://gbdev.gg8.se/wiki/articles/Gameboy_Bootstrap_ROM
+[flags] => https://gekkio.fi/files/gb-docs/gbctr.pdf
+[instructions] => https://meganesu.github.io/generate-gb-opcodes/
+
 

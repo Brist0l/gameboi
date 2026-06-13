@@ -1,2 +1,2 @@
-=> make a memory dump to see the memory which is being edited 
-=> make 0xe2
+=> make memory read and write functions and get the serial outputs
+=> understand the half carry overflows and full carry overflows
