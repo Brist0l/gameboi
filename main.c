@@ -6,7 +6,6 @@
 #include"rom.h"
 #include"debug.h"
 
-
 bool debug_flag = true;
 bool boot_rom_enable = true;
 bool gb_doc = true;
@@ -35,8 +34,8 @@ int main(){
 	memory[0xff44] = 0x90; //  Just to pass the infinite loop
 
 	//_memoryframe(0x0,0x100); // from 0 to 256 bytes
-	int cnt = 0xffff;
-	
+	int cnt = 0xfffff;
+
 	_fillregisters();
 	_memorydump(0x0000,0x01ff);
 	//while(1){
@@ -46,9 +45,9 @@ int main(){
 		 	//printf("0x%04x\n", cpu.PC);
 		execute();
 	}
-	
+
 	registerdump();
-	
+
 	_memorydump(0x0630,0x0700);
 	_memorydump(0x8000,0x9fff);
 	_memorydump(0xff00,0xffff);

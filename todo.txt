@@ -1,2 +1,10 @@
 => make memory read and write functions and get the serial outputs
 => understand the half carry overflows and full carry overflows
+=> make flags for SUB
+=> fix gameboydoc L register value
+=> fix the flag bugs , H and C take old register values and Z takes result
+---DONE---
+=> make rest of the flag functions like INC
+=> distribute the functions into different files
+like with cpu_ld
+

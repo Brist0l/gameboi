@@ -33,5 +33,22 @@ struct registers{
 extern struct registers cpu; // an extern struct with the name "cpu"
 			     
 void execute();
+unsigned short get_u16();
+
+
+extern unsigned short msb;
+extern unsigned short lsb;
+extern unsigned short u16;
+extern unsigned short u8;
+extern unsigned short seventh_bit;
+extern uint8_t addr;
+extern int8_t signed_offset;
+extern unsigned short buffer;
+extern uint8_t result;
+
+extern uint16_t AF;
+extern uint16_t BC;
+extern uint16_t DE;
+extern uint16_t HL;
 
 #endif
