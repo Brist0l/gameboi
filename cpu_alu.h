@@ -3,6 +3,7 @@
 
 void opcd_add_hl_hl();
 void opcd_add_a_b();
+void opcd_add_a_c();
 void opcd_add_a_hl();
 void opcd_add_a_a();
 void opcd_sub_a_b();
@@ -17,6 +18,7 @@ void opcd_xor_memhl();
 void opcd_xor_a();
 void opcd_add_a_u8();
 void opcd_cp_a_hl();
+void opcd_cp_c();
 void opcd_sub_u8();
 void opcd_and_u8();
 

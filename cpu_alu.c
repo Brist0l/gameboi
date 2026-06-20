@@ -11,9 +11,10 @@ void opcd_add_hl_hl(){
 
 	dprintf("ADD HL, HL");
 	dprintf("Value of Register HL before: 0x%04x\n",getHL());
-
-	setADDflags(cpu.A,cpu.B);
-	setHL(getHL() + getHL());
+	
+	result = getHL() + getHL();
+	setADDflags(cpu.A,cpu.B,result);
+	setHL(result);
 
 	dprintf("Value of Register HL after: 0x%04x\n",getHL());
 
@@ -28,10 +29,27 @@ void opcd_add_a_b(){
 	dprintf("ADD A,B");
 	dprintf("Value of Register A before: 0x%02x\n",cpu.A);
 	dprintf("Value of Register B : 0x%02x\n",cpu.B);
+	
+	result = cpu.A + cpu.B;
+	setADDflags(cpu.A,cpu.B,result);
+	cpu.A = result;
 
-	setADDflags(cpu.A,cpu.B);
-	cpu.A += cpu.B;
+	dprintf("Value of Register A after: 0x%02x\n",cpu.A);
+}
 
+void opcd_add_a_c(){
+	// ADD A,C
+	// lenght is 1 byte
+	// Add C to A and store in A
+
+	dprintf("ADD A,C");
+	dprintf("Value of Register A before: 0x%02x\n",cpu.A);
+	dprintf("Value of Register C : 0x%02x\n",cpu.C);
+	
+	result = cpu.A + cpu.C;
+	setADDflags(cpu.A,cpu.C,result);
+
+	cpu.A = result;
 
 	dprintf("Value of Register A after: 0x%02x\n",cpu.A);
 }
@@ -47,9 +65,10 @@ void opcd_add_a_hl(){
 	dprintf("Value of Register HL : 0x%04x\n",getHL());
 	dprintf("Value of Register A before: 0x%02x\n",cpu.A);
 	dprintf("0x%02x is at 0x%04x\n",memory[getHL()],getHL());
-
-	setADDflags(cpu.A,memory_read(getHL()));
-	cpu.A += memory_read(getHL());
+	
+	result = cpu.A + memory_read(getHL());
+	setADDflags(cpu.A,memory_read(getHL()),result);
+	cpu.A = result;
 
 
 	dprintf("Value of Register A after: 0x%02x\n",cpu.A);
@@ -63,9 +82,10 @@ void opcd_add_a_a(){
 
 	dprintf("ADD A,A");
 	dprintf("Value of Register A before: 0x%02x\n",cpu.A);
-
-	setADDflags(cpu.A,cpu.A);
-	cpu.A += cpu.A;
+	
+	result = cpu.A + cpu.A;
+	setADDflags(cpu.A,cpu.A,result);
+	cpu.A = result;
 
 
 	dprintf("Value of Register A after: 0x%02x\n",cpu.A);
@@ -252,8 +272,9 @@ void opcd_add_a_u8(){
 	dprintf("Value of Register A before: 0x%02x\n",cpu.A);
 	dprintf("Value of u8 : 0x%02x\n",u8);
 
-	setADDflags(cpu.A,u8);
-	cpu.A += u8;
+	result = cpu.A + u8;
+	setADDflags(cpu.A,u8,result);
+	cpu.A = result;
 
 	dprintf("Value of Register A after: 0x%02x\n",cpu.A);
 }
@@ -273,6 +294,28 @@ void opcd_cp_a_hl(){
 	dprintf("Value at 0x%04x is: 0x%04x\n",getHL(),memory[getHL()]);
 
 	if(cpu.A - memory_read(getHL()) == 0){
+		dprintf("Setting Zero flag to 1\n");
+		setz(1);
+	}else{
+		dprintf("Setting Zero flag to 0\n");
+		setz(0);
+	}
+}
+
+void opcd_cp_c(){
+	// COMPARE C
+	// Same as CP u8 but this time compare with the content
+	// in C
+	// Basically sets flag after A-C and throws away the result
+	// So if A == C then A - C is 0
+	// hence ,
+	// Z = 1
+
+	dprintf("CP C\n");
+	dprintf("Value of Register C is: 0x%02x\n",cpu.C);
+	dprintf("Value of Register A is: 0x%02x\n",cpu.A);
+
+	if(cpu.A - cpu.C == 0){
 		dprintf("Setting Zero flag to 1\n");
 		setz(1);
 	}else{

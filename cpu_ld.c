@@ -489,7 +489,7 @@ void opcd_ld_c_c(){
 }
 
 void opcd_ld_c_d(){
-	// LOAD D,D
+	// LOAD C,D
 	// lenght is 1 byte
 	// Put value of D into D
 
@@ -577,6 +577,90 @@ void opcd_ld_c_a(){
 	dprintf("Register C value after : 0x%02x\n",cpu.C);
 }
 
+void opcd_ld_d_b(){
+	// LOAD D,B
+	// lenght is 1 byte
+
+	dprintf("LD D, B\n");
+
+	dprintf("Register D value before : 0x%02x\n",cpu.D);
+	dprintf("Register B value : 0x%02x\n",cpu.B);
+
+	cpu.D = cpu.B;
+
+	dprintf("Register D value after : 0x%02x\n",cpu.D);
+}
+
+void opcd_ld_d_c(){
+	// LOAD D,C
+	// lenght is 1 byte
+
+	dprintf("LD D, C\n");
+
+	dprintf("Register D value before : 0x%02x\n",cpu.D);
+	dprintf("Register C value : 0x%02x\n",cpu.C);
+
+	cpu.D = cpu.C;
+
+	dprintf("Register D value after : 0x%02x\n",cpu.D);
+}
+
+void opcd_ld_d_d(){
+	// LOAD D,D
+	// lenght is 1 byte
+
+	dprintf("LD D, D\n");
+
+	dprintf("Register D value before : 0x%02x\n",cpu.D);
+	dprintf("Register D value : 0x%02x\n",cpu.D);
+
+	cpu.D = cpu.D;
+
+	dprintf("Register D value after : 0x%02x\n",cpu.D);
+}
+
+void opcd_ld_d_e(){
+	// LOAD D,E
+	// lenght is 1 byte
+
+	dprintf("LD D, E\n");
+
+	dprintf("Register D value before : 0x%02x\n",cpu.D);
+	dprintf("Register E value : 0x%02x\n",cpu.E);
+
+	cpu.D = cpu.E;
+
+	dprintf("Register D value after : 0x%02x\n",cpu.D);
+}
+
+void opcd_ld_d_h(){
+	// LOAD D,H
+	// lenght is 1 byte
+
+	dprintf("LD D, H\n");
+
+	dprintf("Register D value before : 0x%02x\n",cpu.D);
+	dprintf("Register H value : 0x%02x\n",cpu.H);
+
+	cpu.D = cpu.H;
+
+	dprintf("Register D value after : 0x%02x\n",cpu.D);
+}
+
+void opcd_ld_d_l(){
+	// LOAD D,L
+	// lenght is 1 byte
+
+	dprintf("LD D, L\n");
+
+	dprintf("Register D value before : 0x%02x\n",cpu.D);
+	dprintf("Register L value : 0x%02x\n",cpu.L);
+
+	cpu.D = cpu.L;
+
+	dprintf("Register D value after : 0x%02x\n",cpu.D);
+}
+
 void opcd_ld_d_hl(){
 	// LOAD D,(HL)
 	// lenght is 1 byte
@@ -637,6 +721,92 @@ void opcd_ld_e_l(){
 
 }
 
+void opcd_ld_e_b(){
+	// LOAD E,B
+	// lenght is 1 byte
+
+	dprintf("LD E, B\n");
+	dprintf("Register E value before : 0x%02x\n",cpu.E);
+	dprintf("Register B value : 0x%02x\n",cpu.B);
+
+	cpu.E = cpu.B;
+
+	dprintf("Register E value after : 0x%02x\n",cpu.E);
+
+}
+
+void opcd_ld_e_c(){
+	// LOAD E,C
+	// lenght is 1 byte
+
+	dprintf("LD E, C\n");
+	dprintf("Register E value before : 0x%02x\n",cpu.E);
+	dprintf("Register C value : 0x%02x\n",cpu.C);
+
+	cpu.E = cpu.C;
+
+	dprintf("Register E value after : 0x%02x\n",cpu.E);
+
+}
+
+void opcd_ld_e_d(){
+	// LOAD E,D
+	// lenght is 1 byte
+
+	dprintf("LD E, D\n");
+	dprintf("Register E value before : 0x%02x\n",cpu.E);
+	dprintf("Register D value : 0x%02x\n",cpu.D);
+
+	cpu.E = cpu.D;
+
+	dprintf("Register E value after : 0x%02x\n",cpu.E);
+
+}
+void opcd_ld_e_e(){
+	// LOAD E,E
+	// lenght is 1 byte
+
+	dprintf("LD E, E\n");
+	dprintf("Register E value before : 0x%02x\n",cpu.E);
+	dprintf("Register E value : 0x%02x\n",cpu.E);
+
+	cpu.E = cpu.E;
+
+	dprintf("Register E value after : 0x%02x\n",cpu.E);
+
+}
+void opcd_ld_e_h(){
+	// LOAD E,H
+	// lenght is 1 byte
+
+	dprintf("LD E, H\n");
+	dprintf("Register E value before : 0x%02x\n",cpu.E);
+	dprintf("Register H value : 0x%02x\n",cpu.H);
+
+	cpu.E = cpu.H;
+
+	dprintf("Register E value after : 0x%02x\n",cpu.E);
+
+}
+
+void opcd_ld_e_hl(){
+	// LOAD E,(HL)
+	// lenght is 1 byte
+	// put data at HL into  L
+
+	dprintf("LD E, (HL)\n");
+
+	dprintf("HL Register: 0x%04x\n",getHL());
+	dprintf("Value of Register D before: 0x%02x\n",cpu.E);
+	dprintf("value at HL: 0x%02x\n",memory_read(getHL()));
+
+	HL = getHL();
+
+	cpu.E = memory_read(HL);
+
+	dprintf("Value of Register E after: 0x%02x\n",cpu.E);
+}
+
 void opcd_ld_h_a(){
 	// LOAD H,A
 	// lenght is 1 byte
@@ -650,6 +820,102 @@ void opcd_ld_h_a(){
 
 	dprintf("Register H value after : 0x%02x\n",cpu.H);
 
+}
+
+void opcd_ld_h_b(){
+	// LOAD H,B
+	// lenght is 1 byte
+
+	dprintf("LD H, B\n");
+	dprintf("Register H value before : 0x%02x\n",cpu.H);
+	dprintf("Register B value : 0x%02x\n",cpu.B);
+
+	cpu.H = cpu.B;
+
+	dprintf("Register H value after : 0x%02x\n",cpu.H);
+}
+
+void opcd_ld_h_c(){
+	// LOAD H,C
+	// lenght is 1 byte
+
+	dprintf("LD H, C\n");
+	dprintf("Register H value before : 0x%02x\n",cpu.H);
+	dprintf("Register C value : 0x%02x\n",cpu.C);
+
+	cpu.H = cpu.C;
+
+	dprintf("Register H value after : 0x%02x\n",cpu.H);
+}
+
+void opcd_ld_h_d(){
+	// LOAD H,D
+	// lenght is 1 byte
+
+	dprintf("LD H, D\n");
+	dprintf("Register H value before : 0x%02x\n",cpu.H);
+	dprintf("Register D value : 0x%02x\n",cpu.D);
+
+	cpu.H = cpu.D;
+
+	dprintf("Register H value after : 0x%02x\n",cpu.H);
+}
+
+void opcd_ld_h_e(){
+	// LOAD H,E
+	// lenght is 1 byte
+
+	dprintf("LD H, E\n");
+	dprintf("Register H value before : 0x%02x\n",cpu.H);
+	dprintf("Register E value : 0x%02x\n",cpu.E);
+
+	cpu.H = cpu.E;
+
+	dprintf("Register H value after : 0x%02x\n",cpu.H);
+}
+
+void opcd_ld_h_h(){
+	// LOAD H,H
+	// lenght is 1 byte
+
+	dprintf("LD H, H\n");
+	dprintf("Register H value before : 0x%02x\n",cpu.H);
+	dprintf("Register H value : 0x%02x\n",cpu.H);
+
+	cpu.H = cpu.H;
+
+	dprintf("Register H value after : 0x%02x\n",cpu.H);
+}
+
+void opcd_ld_h_l(){
+	// LOAD H,L
+	// lenght is 1 byte
+
+	dprintf("LD H, L\n");
+	dprintf("Register H value before : 0x%02x\n",cpu.H);
+	dprintf("Register L value : 0x%02x\n",cpu.L);
+
+	cpu.H = cpu.L;
+
+	dprintf("Register H value after : 0x%02x\n",cpu.H);
+}
+
+void opcd_ld_h_hl(){
+	// LOAD H,(HL)
+	// lenght is 1 byte
+	// put data at HL into  H
+
+	dprintf("LD H, (HL)\n");
+
+	dprintf("HL Register: 0x%04x\n",getHL());
+	dprintf("Value of Register D before: 0x%02x\n",cpu.H);
+	dprintf("value at HL: 0x%02x\n",memory_read(getHL()));
+
+	HL = getHL();
+
+	cpu.H = memory_read(HL);
+
+	dprintf("Value of Register H after: 0x%02x\n",cpu.H);
 }
 
 void opcd_ld_l_hl(){
@@ -681,6 +947,90 @@ void opcd_ld_l_a(){
 	dprintf("Register A value : 0x%02x\n",cpu.A);
 
 	cpu.L = cpu.A;
+
+	dprintf("Register L value after : 0x%02x\n",cpu.L);
+}
+
+void opcd_ld_l_b(){
+	// LOAD L,B
+	// lenght is 1 byte
+
+	dprintf("LD L, B\n");
+
+	dprintf("Register L value before : 0x%02x\n",cpu.L);
+	dprintf("Register B value : 0x%02x\n",cpu.B);
+
+	cpu.L = cpu.B;
+
+	dprintf("Register L value after : 0x%02x\n",cpu.L);
+}
+
+void opcd_ld_l_c(){
+	// LOAD L,C
+	// lenght is 1 byte
+
+	dprintf("LD L, C\n");
+
+	dprintf("Register L value before : 0x%02x\n",cpu.L);
+	dprintf("Register C value : 0x%02x\n",cpu.C);
+
+	cpu.L = cpu.C;
+
+	dprintf("Register L value after : 0x%02x\n",cpu.L);
+}
+
+void opcd_ld_l_d(){
+	// LOAD L,D
+	// lenght is 1 byte
+
+	dprintf("LD L, D\n");
+
+	dprintf("Register L value before : 0x%02x\n",cpu.L);
+	dprintf("Register D value : 0x%02x\n",cpu.D);
+
+	cpu.L = cpu.D;
+
+	dprintf("Register L value after : 0x%02x\n",cpu.L);
+}
+
+void opcd_ld_l_e(){
+	// LOAD L,E
+	// lenght is 1 byte
+
+	dprintf("LD L, E\n");
+
+	dprintf("Register L value before : 0x%02x\n",cpu.L);
+	dprintf("Register E value : 0x%02x\n",cpu.E);
+
+	cpu.L = cpu.E;
+
+	dprintf("Register L value after : 0x%02x\n",cpu.L);
+}
+
+void opcd_ld_l_h(){
+	// LOAD L,H
+	// lenght is 1 byte
+
+	dprintf("LD L, H\n");
+
+	dprintf("Register L value before : 0x%02x\n",cpu.L);
+	dprintf("Register H value : 0x%02x\n",cpu.H);
+
+	cpu.L = cpu.H;
+
+	dprintf("Register L value after : 0x%02x\n",cpu.L);
+}
+
+void opcd_ld_l_l(){
+	// LOAD L,L
+	// lenght is 1 byte
+
+	dprintf("LD L, L\n");
+
+	dprintf("Register L value before : 0x%02x\n",cpu.L);
+	dprintf("Register L value : 0x%02x\n",cpu.L);
+
+	cpu.L = cpu.L;
 
 	dprintf("Register L value after : 0x%02x\n",cpu.L);
 }
@@ -728,6 +1078,38 @@ void opcd_ld_hl_d(){
 	dprintf("before : 0x%02x is at 0x%04x\n",memory_read(getHL()),getHL());
 
 	memory_write(getHL(),cpu.D);
+
+	dprintf("after : 0x%02x is at 0x%04x\n",memory_read(getHL()),getHL());
+
+}
+
+void opcd_ld_hl_h(){
+	// LOAD (HL),H
+	// lenght is 1 byte
+	// put data of H into memory of HL
+
+	dprintf("LD HL, H\n");
+	dprintf("Value of Register HL : 0x%04x\n",getHL());
+	dprintf("Value of Register H : 0x%02x\n",cpu.H);
+	dprintf("before : 0x%02x is at 0x%04x\n",memory_read(getHL()),getHL());
+
+	memory_write(getHL(),cpu.H);
+
+	dprintf("after : 0x%02x is at 0x%04x\n",memory_read(getHL()),getHL());
+
+}
+
+void opcd_ld_hl_l(){
+	// LOAD (HL),L
+	// lenght is 1 byte
+	// put data of L into memory of HL
+
+	dprintf("LD HL, L\n");
+	dprintf("Value of Register HL : 0x%04x\n",getHL());
+	dprintf("Value of Register L : 0x%02x\n",cpu.L);
+	dprintf("before : 0x%02x is at 0x%04x\n",memory_read(getHL()),getHL());
+
+	memory_write(getHL(),cpu.L);
 
 	dprintf("after : 0x%02x is at 0x%04x\n",memory_read(getHL()),getHL());
 
@@ -835,6 +1217,21 @@ void opcd_ld_a_l(){
 	dprintf("Register L value : 0x%02x\n",cpu.L);
 
 	cpu.A = cpu.L;
+
+	dprintf("Register A value after : 0x%02x\n",cpu.A);
+
+}
+
+void opcd_ld_a_a(){
+	// LOAD A,A
+	// lenght is 1 byte
+	// Put contents of A into A
+
+	dprintf("LD A, A\n");
+	dprintf("Register A value before : 0x%02x\n",cpu.A);
+	dprintf("Register A value : 0x%02x\n",cpu.A);
+
+	cpu.A = cpu.A;
 
 	dprintf("Register A value after : 0x%02x\n",cpu.A);
 

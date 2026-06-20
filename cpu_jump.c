@@ -52,6 +52,31 @@ void opcd_ret_nc(){
 
 }
 
+void opcd_ret_c(){
+	// RET C
+	// lenght is 1 byte
+	// POP the stack and put it into the PC if C flag is 1
+
+	dprintf("RET C\n");
+
+	if(getC() == 1){
+		dprintf("SP before: 0x%04x\n",cpu.SP);
+
+		lsb = pop(); // P of the PC
+		msb = pop();  // C of the PC
+
+		u16 = (msb << 8) | lsb;
+
+		cpu.PC = u16;
+
+		dprintf("Value of register PC : 0x%04x\n",cpu.PC + 1);
+		dprintf("SP after: 0x%04x\n",cpu.SP);
+	}
+	else
+		dprintf("C is 0 , not returning\n");
+
+}
+
 void opcd_ret_z(){
 	// RET Z
 	// lenght is 1 byte
@@ -112,6 +137,32 @@ void opcd_call_nz_u16(){
 	printf("Z flag: 0b%b\n",getz());
 
 	if(getz() == 0){
+		//store the current addr to the stack
+		lsb = cpu.PC & 0x00ff;
+		msb = (cpu.PC & 0xff00) >> 8;
+
+		dprintf("Storing 0x%04x first\n",msb);
+		push(msb);
+		dprintf("Storing 0x%04x next\n",lsb);
+		push(lsb);
+
+		cpu.PC = u16 - 1; // +1 will be done at the end
+
+		dprintf("CALL and Jumping to 0x%04x\n",u16);
+	}
+
+
+}
+
+void opcd_call_nc_u16(){
+	// CALL NC , u16
+	// lenght is 3 bytes
+
+	dprintf("CALL NC, u16\n");
+	u16 = get_u16();
+	printf("C flag: 0b%b\n",getC());
+
+	if(getC() == 0){
 		//store the current addr to the stack
 		lsb = cpu.PC & 0x00ff;
 		msb = (cpu.PC & 0xff00) >> 8;

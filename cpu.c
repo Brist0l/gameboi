@@ -60,6 +60,8 @@ uint16_t BC;
 uint16_t DE;
 uint16_t HL;
 
+long long instr_cnt = 1;
+
 unsigned short get_u16(){
 	lsb = memory_read(++cpu.PC);
 	dprintf("LSB: 0x%04x\n",lsb);
@@ -410,6 +412,13 @@ void execute(){
 			opcd_jr_c_u8();
 			break;
 
+		case 0x3c:
+			// INC A
+			// lenght is 1 byte
+
+			opcd_inc_a();
+			break;
+
 		case 0x3d:
 			// DEC A
 			// lenght is 1 byte
@@ -438,7 +447,7 @@ void execute(){
 
 			opcd_ld_b_c();
 			break;
-			
+
 		case 0x42:
 			// LOAD B,D
 			// lenght is 1 byte
@@ -546,6 +555,48 @@ void execute(){
 			opcd_ld_c_a();
 			break;
 
+		case 0x50:
+			// LOAD D,B
+			// lenght is 1 byte
+
+			opcd_ld_d_b();
+			break;
+
+		case 0x51:
+			// LOAD D,C
+			// lenght is 1 byte
+
+			opcd_ld_d_c();
+			break;
+
+		case 0x52:
+			// LOAD D,D
+			// lenght is 1 byte
+
+			opcd_ld_d_d();
+			break;
+
+		case 0x53:
+			// LOAD D,E
+			// lenght is 1 byte
+
+			opcd_ld_d_e();
+			break;
+
+		case 0x54:
+			// LOAD D,H
+			// lenght is 1 byte
+
+			opcd_ld_d_h();
+			break;
+
+		case 0x55:
+			// LOAD D,L
+			// lenght is 1 byte
+
+			opcd_ld_d_l();
+			break;
+
 		case 0x56:
 			// LOAD D,(HL)
 			// lenght is 1 byte
@@ -560,10 +611,48 @@ void execute(){
 
 			opcd_ld_d_a();
 			break;
+
+		case 0x58:
+			// LOAD E, B
+
+			opcd_ld_e_b();
+			break;
+
+		case 0x59:
+			// LOAD E, C
+
+			opcd_ld_e_c();
+			break;
+
+		case 0x5a:
+			// LOAD E, D
+
+			opcd_ld_e_d();
+			break;
+
+		case 0x5b:
+			// LOAD E, E
+
+			opcd_ld_e_e();
+			break;
+
+		case 0x5c:
+			// LOAD E, H
+
+			opcd_ld_e_h();
+			break;
+
+
 		case 0x5d:
 			//LD E, L
 
 			opcd_ld_e_l();
+			break;
+
+		case 0x5e:
+			//LD E,(HL)
+
+			opcd_ld_e_hl();
 			break;
 
 		case 0x5f:
@@ -573,6 +662,48 @@ void execute(){
 			opcd_ld_e_a();
 			break;
 
+		case 0x60:
+			// LOAD H, B
+
+			opcd_ld_h_b();
+			break;
+
+		case 0x61:
+			// LOAD H, C
+
+			opcd_ld_h_c();
+			break;
+
+		case 0x62:
+			// LOAD H, D
+
+			opcd_ld_h_d();
+			break;
+
+		case 0x63:
+			// LOAD H, E
+
+			opcd_ld_h_e();
+			break;
+
+		case 0x64:
+			// LOAD H, H
+
+			opcd_ld_h_h();
+			break;
+
+		case 0x65:
+			// LOAD H, L
+
+			opcd_ld_h_l();
+			break;
+
+		case 0x66:
+			// LOAD H, (HL)
+
+			opcd_ld_h_hl();
+			break;
+
 		case 0x67:
 			// LOAD H,A
 			// lenght is 1 byte
@@ -580,6 +711,43 @@ void execute(){
 
 			opcd_ld_h_a();
 			break;
+
+		case 0x68:
+			// LD L, B
+
+			opcd_ld_l_b();
+			break;
+
+		case 0x69:
+			// LD L, C
+
+			opcd_ld_l_c();
+			break;
+
+		case 0x6a:
+			// LD L, D
+
+			opcd_ld_l_d();
+			break;
+
+		case 0x6b:
+			// LD L, E
+
+			opcd_ld_l_e();
+			break;
+
+		case 0x6c:
+			// LD L, H
+
+			opcd_ld_l_h();
+			break;
+
+		case 0x6d:
+			// LD L, L
+
+			opcd_ld_l_l();
+			break;
+
 
 		case 0x6e:
 			// LOAD L , (HL)
@@ -619,6 +787,7 @@ void execute(){
 
 			opcd_ld_hl_d();
 			break;
+
 		case 0x73:
 			// LOAD (HL),E
 			// lenght is 1 byte
@@ -627,13 +796,24 @@ void execute(){
 			opcd_ld_hl_e();
 			break;
 
+		case 0x74:
+			// LD (HL), H
+
+			opcd_ld_hl_h();
+			break;
+
+		case 0x75:
+			// LD (HL), L
+
+			opcd_ld_hl_l();
+			break;
+
 		case 0x77:
 			// LOAD (HL),A
 			// lenght is 1 byte
 			// put data of A into memory of HL
 
 			opcd_ld_hl_a();
-
 			break;
 
 		case 0x78:
@@ -657,7 +837,6 @@ void execute(){
 			// Put contents of D into A
 
 			opcd_ld_a_d();
-
 			break;
 
 		case 0x7b:
@@ -692,12 +871,26 @@ void execute(){
 			opcd_ld_a_hl();
 			break;
 
+		case 0x7f:
+			// LD A,A
+
+			opcd_ld_a_a();
+			break;
+
 		case 0x80:
 			// ADD A,B
 			// lenght is 1 byte
 			// Add B to A and store in A
 
 			opcd_add_a_b();
+			break;
+
+		case 0x81:
+			// ADD A,C
+			// lenght is 1 byte
+			// Add C to A and store in A
+
+			opcd_add_a_c();
 			break;
 
 		case 0x86:
@@ -738,7 +931,7 @@ void execute(){
 			// ALU operation
 			// lenght is 1 byte
 			// XOR's the value which is in A with A and stores in A
-			
+
 			opcd_xor_c();
 			break;
 		case 0xad:
@@ -804,6 +997,13 @@ void execute(){
 			opcd_or_a();
 			break;
 
+		case 0xb9:
+			// CP C
+			// Calculate A - C and set Z flag
+
+			opcd_cp_c();
+			break;
+
 		case 0xbe:
 			// COMPARE A , (HL)
 			// Same as CP u8 but this time compare with the content
@@ -820,19 +1020,7 @@ void execute(){
 			// POP BC
 			// lenght is 1 byte
 
-			dprintf("POP BC\n");
-			dprintf("SP before: 0x%04x\n",cpu.SP);
-
-			lsb = pop(); // C
-			msb = pop();  // B
-
-			u16 = (msb << 8) | lsb;
-
-			setBC(u16);
-
-			dprintf("Value of register BC : 0x%04x\n",getBC());
-			dprintf("SP after: 0x%04x\n",cpu.SP);
-
+			opcd_pop_bc();
 			break;
 
 		case 0xc3:
@@ -848,7 +1036,7 @@ void execute(){
 			// lenght is 1 byte
 			// PUSH's the value which is in BC
 			// and decrements the SP twice
-			
+
 			opcd_push_bc();
 			break;
 
@@ -859,6 +1047,7 @@ void execute(){
 
 			opcd_add_a_u8();
 			break;
+
 		case 0xc8:
 			// RET Z
 			// Ret only if Z is 1
@@ -893,7 +1082,7 @@ void execute(){
 					// the LSB and copy the shifted
 					// out bit to the carry flag
 
-					opcd_rl_c();	
+					opcd_rl_c();
 					break;
 
 				case 0x19:
@@ -949,7 +1138,7 @@ void execute(){
 					// N = 0
 					// H = 0
 					// C = 0
-						
+
 					opcd_shift_a();
 					break;
 
@@ -964,7 +1153,7 @@ void execute(){
 
 					opcd_srl_b();
 					break;
-				
+
 
 				case 0x4f:
 					// BIT 1,A
@@ -1053,14 +1242,18 @@ void execute(){
 			// POP the stack and put it into the PC if C flag is 0
 
 			opcd_ret_nc();
-
 			break;
 
 		case 0xd1:
 			// POP DE
 			// lenght is 1 byte
-			
+
 			opcd_pop_de();
+			break;
+		case 0xd4:
+			// CALL NC , u16
+
+			opcd_call_nc_u16();
 			break;
 
 		case 0xd5:
@@ -1068,7 +1261,7 @@ void execute(){
 			// lenght is 1 byte
 			// PUSH's the value which is in DE
 			// and decrements the SP twice
-			
+
 			opcd_push_de();
 			break;
 
@@ -1076,8 +1269,15 @@ void execute(){
 			// SUB u8
 			// lenght is 2 byte
 			// subtract u8 from A
-			
+
 			opcd_sub_u8();
+			break;
+
+		case 0xd8:
+			// RET C
+			// POP the stack and put
+			// it in the PC if C is 1
+			opcd_ret_c();
 			break;
 
 		case 0xe0:
@@ -1113,7 +1313,7 @@ void execute(){
 			// lenght is 1 byte
 			// PUSH's the value which is in HL
 			// and decrements the SP twice
-			
+
 			opcd_push_hl();
 			break;
 
@@ -1274,7 +1474,8 @@ void execute(){
 		default:
 			//sleep(2);true
     			printf(
-        		"UNIMPLEMENTED OPCODE %02x at PC=0x%04x\n",
+        		"[%lld] UNIMPLEMENTED OPCODE %02x at PC=0x%04x\n",
+			instr_cnt,
         		opcode,
         		cpu.PC
     			);
@@ -1284,6 +1485,7 @@ void execute(){
 	}
 
 	cpu.PC++;
+	instr_cnt++;
 
 	if(gb_doc == true)
 		gb_doc_log();

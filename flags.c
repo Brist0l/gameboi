@@ -88,8 +88,8 @@ int getC(){
 	return ((cpu.F & 0b00010000) >> 4);
 }
 
-void setADDflags(uint8_t a,uint8_t b){
-	if(a == 0)
+void setADDflags(uint8_t a,uint8_t b,uint8_t result){
+	if(result == 0)
 		setz(1);
 	else
 		setz(0);

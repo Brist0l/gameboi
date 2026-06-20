@@ -3,6 +3,24 @@
 #include "memory.h"
 #include "debug.h"
 
+void opcd_pop_bc(){
+	// POP BC
+	// lenght is 1 byte
+
+	dprintf("POP BC\n");
+	dprintf("SP before: 0x%04x\n",cpu.SP);
+
+	lsb = pop(); // C
+	msb = pop();  // B
+
+	u16 = (msb << 8) | lsb;
+
+	setBC(u16);
+
+	dprintf("Value of register BC : 0x%04x\n",getBC());
+	dprintf("SP after: 0x%04x\n",cpu.SP);
+}
+
 void opcd_push_bc(){
 
 	// PUSH BC

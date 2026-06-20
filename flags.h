@@ -11,8 +11,7 @@ void seth(const unsigned short val);
 int geth();
 void setc(const unsigned short val);
 int getC();
-
-void setADDflags(uint8_t a,uint8_t b);
+void setADDflags(uint8_t a,uint8_t b,uint8_t result);
 void setADCflags(uint8_t a,uint8_t b,uint8_t c);
 void setSUBflags(uint8_t a,uint8_t b);
 void setINCflags(uint8_t r,uint8_t result);

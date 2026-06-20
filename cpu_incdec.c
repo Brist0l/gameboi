@@ -38,6 +38,21 @@ void opcd_inc_b(){
 
 }
 
+void opcd_inc_a(){
+	// INC A
+	// lenght is 1 byte
+
+	dprintf("INC A\n");
+	dprintf("Value of register A before is: 0x%04x\n",cpu.A);
+
+	result = cpu.A + 1;
+	setINCflags(cpu.A,result);
+
+	cpu.A = result;
+
+	dprintf("Value of register A after is: 0x%04x\n",cpu.A);
+}
+
 void opcd_dec_b(){
 	// DEC B
 	// lenght is 1 byte

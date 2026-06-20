@@ -3,10 +3,12 @@
 
 void opcd_ret();
 void opcd_ret_nc();
+void opcd_ret_c();
 void opcd_ret_z();
 void opcd_jp_hl();
 void opcd_jp_u16();
 void opcd_call_nz_u16();
+void opcd_call_nc_u16();
 void opcd_call_u16();
 void opcd_jr_u8();
 void opcd_jr_nz_u8();

@@ -3,6 +3,7 @@
 
 void opcd_inc_bc();
 void opcd_inc_b();
+void opcd_inc_a();
 void opcd_dec_b();
 void opcd_inc_c();
 void opcd_dec_c();
