@@ -53,7 +53,7 @@ unsigned short seventh_bit;
 uint8_t addr;
 int8_t signed_offset;
 unsigned short buffer;
-uint8_t result;
+uint16_t result;
 
 uint16_t AF;
 uint16_t BC;
@@ -116,6 +116,12 @@ void execute(){
 			// store u16 in BC
 
 			opcd_ld_bc_u16();
+			break;
+
+		case 0x02:
+			// LD (BC),A
+
+			opcd_ld_bc_a();
 			break;
 
 		case 0x03:
@@ -1016,6 +1022,13 @@ void execute(){
 			opcd_cp_a_hl();
 			break;
 
+		case 0xc0:
+			// RET NZ
+			// if Z flag 0 then ret
+
+			opcd_ret_nz();
+			break;
+
 		case 0xc1:
 			// POP BC
 			// lenght is 1 byte
@@ -1094,6 +1107,7 @@ void execute(){
 
 
 					opcd_rr_c();
+					//exit(1);
 					break;
 
 				case 0x1a:
@@ -1214,6 +1228,7 @@ void execute(){
 			// lenght is 3 bytes
 
 			opcd_call_u16();
+			//sleep(5);
 			break;
 
 		case 0xce:
@@ -1221,19 +1236,7 @@ void execute(){
 			// Add u8 and C flag to A
 			// Set Z flags, N = 0, H and C
 
-			dprintf("ADC A,u8\n");
-
-			u8 = memory_read(++cpu.PC);
-			dprintf("u8 : 0x%02x\n",u8);
-
-			dprintf("ADC A, 0x%02x\n",u8);
-
-			dprintf("Value of Register A before: 0x%02x\n",cpu.A);
-			setADCflags(cpu.A,u8,getC());
-			cpu.A = cpu.A + getC() + u8;
-
-			dprintf("Value of Register A after: 0x%02x\n",cpu.A);
-
+			opcd_adc_a_u8();
 			break;
 
 		case 0xd0:
@@ -1453,6 +1456,8 @@ void execute(){
 			// hence ,
 			// Z = 1
 			//
+			// N = 1 (always)
+			// set H and C
 
 			u8 = memory_read(++cpu.PC);
 			dprintf("u8: 0x%02x\n",u8);
@@ -1466,6 +1471,10 @@ void execute(){
 				dprintf("Setting Zero flag to 0\n");
 				setz(0);
 			}
+
+			setn(1);
+			seth((cpu.A & 0xF) < (u8 & 0xF));
+			setc(cpu.A < u8);
 
 			//sleep(1);
 
@@ -1484,15 +1493,19 @@ void execute(){
 
 	}
 
+	if(cpu.PC == 0x100)
+		gb_doc_log();
+
 	cpu.PC++;
 	instr_cnt++;
 
 	if(gb_doc == true)
 		gb_doc_log();
 
+	//if(instr_cnt == 31581)
+		//exit(1);
 
 	dprintf("\nRegister PC after: 0x%04x\n",cpu.PC);
-	_memorydump(0xff40,0xff4b);
-	logmsg("execute",false);
 
+	logmsg("execute",false);
 }

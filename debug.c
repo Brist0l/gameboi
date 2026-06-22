@@ -96,7 +96,27 @@ void _fillregisters(){
 
 void gb_doc_log(){
 	printf(
-"A:%02x F:%02x B:%02x C:%02x D:%02x E:%02x H:%02x L:%02x SP:%04x PC:%04x PCMEM:%02x,%02x,%02x,%02x\n"
+"A:%02X F:%02X B:%02X C:%02X D:%02X E:%02X H:%02X L:%02X SP:%04X PC:%04X PCMEM:%02X,%02X,%02X,%02X\n"
+		,cpu.A
+		,cpu.F
+		,cpu.B
+		,cpu.C
+		,cpu.D
+		,cpu.E
+		,cpu.H
+		,cpu.L
+		,cpu.SP
+		,cpu.PC
+		,memory_read(cpu.PC)
+		,memory_read(cpu.PC+1)
+		,memory_read(cpu.PC+2)
+		,memory_read(cpu.PC+3)
+		);
+}
+
+void other_log(){
+	printf(
+"A: %02X F: %02X B: %02X C: %02X D: %02X E: %02X H: %02X L: %02X SP: %04X PC: 00:%04X (%02X %02X %02X %02X)\n"
 		,cpu.A
 		,cpu.F
 		,cpu.B

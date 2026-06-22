@@ -24,6 +24,20 @@ void opcd_ld_bc_u16(){
 
 }
 
+void opcd_ld_bc_a(){
+	// LD (BC), A
+	// lenght is 3 bytes
+	// store u16 in BC
+
+	dprintf("LD (BC), A\n");
+
+	dprintf("Value of Register BC: 0x%04x\n",getBC());
+	dprintf("Value of Register A : 0x%02x\n",cpu.A);
+	
+	memory_write(getBC(),cpu.A);
+
+}
+
 void opcd_ld_b_u8(){
 	// LOAD B,u8
 	// lenght is 2 bytes

@@ -3,6 +3,7 @@
 
 void opcd_ret();
 void opcd_ret_nc();
+void opcd_ret_nz();
 void opcd_ret_c();
 void opcd_ret_z();
 void opcd_jp_hl();

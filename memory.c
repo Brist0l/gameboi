@@ -1,8 +1,13 @@
 #include<stdint.h>
 #include<stdio.h>
+#include<unistd.h>
 
-#include"cpu.h"
+#include "cpu.h"
+#include "debug.h"
 
+char serial_data;
+char serial_data_string[0x100];
+int i = 0;
 uint8_t memory[0xFFFF];
 
 /*
@@ -67,13 +72,18 @@ uint8_t pop(){
 }
 
 void memory_write(uint16_t mem_addr,uint8_t val){
-	char serial_data;
+	if(mem_addr == 0xff01){
+        	serial_data = val;
+	}
 
-	//if(mem_addr == 0xff01)
-        	//serial_data = val;
-
-    	//if(mem_addr == 0xff02 && val == 0x81)
-        	//printf("Serial IO: %c\n",serial_data);
+    	if(mem_addr == 0xff02 && val == 0x81){
+		serial_data_string[i++] = serial_data;
+		dprintf("0x%x",serial_data);
+		if(serial_data  == 's'){
+        		dprintf("Serial IO: %s\n",serial_data_string);
+			sleep(2);
+		}
+	}
 
 	//if(mem_addr >= 0x9900 && mem_addr <= 0x9940)
 	    //printf("WRITE 0x%04x = 0x%02x\n",mem_addr,val);

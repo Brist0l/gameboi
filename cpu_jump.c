@@ -20,7 +20,7 @@ void opcd_ret(){
 
 	u16 = (msb << 8) | lsb;
 
-	cpu.PC = u16;
+	cpu.PC = u16 - 1;
 
 	dprintf("Value of register PC : 0x%04x\n",cpu.PC + 1);
 	dprintf("SP after: 0x%04x\n",cpu.SP);
@@ -42,13 +42,38 @@ void opcd_ret_nc(){
 
 		u16 = (msb << 8) | lsb;
 
-		cpu.PC = u16;
+		cpu.PC = u16 - 1;
 
 		dprintf("Value of register PC : 0x%04x\n",cpu.PC + 1);
 		dprintf("SP after: 0x%04x\n",cpu.SP);
 	}
 	else
 		dprintf("C is 1 , not returning\n");
+
+}
+
+void opcd_ret_nz(){
+	// RET NZ
+	// lenght is 1 byte
+	// POP the stack and put it into the PC if Z flag is 0
+
+	dprintf("RET NZ\n");
+
+	if(getz() == 0){
+		dprintf("SP before: 0x%04x\n",cpu.SP);
+
+		lsb = pop(); // P of the PC
+		msb = pop();  // C of the PC
+
+		u16 = (msb << 8) | lsb;
+
+		cpu.PC = u16 - 1;
+
+		dprintf("Value of register PC : 0x%04x\n",cpu.PC + 1);
+		dprintf("SP after: 0x%04x\n",cpu.SP);
+	}
+	else
+		dprintf("Z is 1 , not returning\n");
 
 }
 
@@ -67,7 +92,7 @@ void opcd_ret_c(){
 
 		u16 = (msb << 8) | lsb;
 
-		cpu.PC = u16;
+		cpu.PC = u16 - 1;
 
 		dprintf("Value of register PC : 0x%04x\n",cpu.PC + 1);
 		dprintf("SP after: 0x%04x\n",cpu.SP);
@@ -92,7 +117,7 @@ void opcd_ret_z(){
 
 		u16 = (msb << 8) | lsb;
 
-		cpu.PC = u16;
+		cpu.PC = u16 - 1;
 
 		dprintf("Value of register PC : 0x%04x\n",cpu.PC + 1);
 		dprintf("SP after: 0x%04x\n",cpu.SP);
@@ -134,12 +159,12 @@ void opcd_call_nz_u16(){
 
 	dprintf("CALL NZ, u16\n");
 	u16 = get_u16();
-	printf("Z flag: 0b%b\n",getz());
+	dprintf("Z flag: 0b%b\n",getz());
 
 	if(getz() == 0){
 		//store the current addr to the stack
-		lsb = cpu.PC & 0x00ff;
-		msb = (cpu.PC & 0xff00) >> 8;
+		lsb = (cpu.PC + 1) & 0x00ff;
+		msb = ((cpu.PC + 1) & 0xff00) >> 8;
 
 		dprintf("Storing 0x%04x first\n",msb);
 		push(msb);
@@ -164,8 +189,8 @@ void opcd_call_nc_u16(){
 
 	if(getC() == 0){
 		//store the current addr to the stack
-		lsb = cpu.PC & 0x00ff;
-		msb = (cpu.PC & 0xff00) >> 8;
+		lsb = (cpu.PC+1) & 0x00ff;
+		msb = ((cpu.PC+1) & 0xff00) >> 8;
 
 		dprintf("Storing 0x%04x first\n",msb);
 		push(msb);
@@ -188,8 +213,8 @@ void opcd_call_u16(){
 	u16 = get_u16();
 
 	//store the current addr to the stack
-	lsb = cpu.PC & 0x00ff;
-	msb = (cpu.PC & 0xff00) >> 8;
+	lsb = (cpu.PC + 1) & 0x00ff;
+	msb = ((cpu.PC + 1) & 0xff00) >> 8;
 
 	dprintf("Storing 0x%04x first\n",msb);
 	push(msb);

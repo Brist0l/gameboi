@@ -8,13 +8,16 @@ void opcd_add_hl_hl(){
 	// ADD HL,HL
 	// lenght is 1 byte
 	// Add HL to HL and store in HL
+	// Zero flag ain't changed
 
 	dprintf("ADD HL, HL");
 	dprintf("Value of Register HL before: 0x%04x\n",getHL());
 	
-	result = getHL() + getHL();
-	setADDflags(cpu.A,cpu.B,result);
-	setHL(result);
+	setn(0);
+	seth(((getHL() & 0x0FFF) + (getHL() & 0x0FFF)) > 0xFFF);
+	setc(((uint32_t)getHL() + (uint32_t)getHL()) > 0xFFFF);
+
+	setHL(getHL() + getHL());
 
 	dprintf("Value of Register HL after: 0x%04x\n",getHL());
 
@@ -100,12 +103,12 @@ void opcd_sub_a_b(){
 	dprintf("SUB B\n");
 	dprintf("Value of register A before : 0x%02x\n",cpu.A);
 	dprintf("Value of register B : 0x%02x\n",cpu.B);
-
-	setSUBflags(cpu.A,cpu.B);
-	cpu.A -= cpu.B;
+	
+	result = cpu.A - cpu.B;
+	setSUBflags(cpu.A,cpu.B,result);
+	cpu.A = result;
 
 	dprintf("Value of register A after : 0x%02x\n",cpu.A);
-
 }
 
 void opcd_sub_a_c(){
@@ -116,9 +119,10 @@ void opcd_sub_a_c(){
 	dprintf("SUB C\n");
 	dprintf("Value of register A before : 0x%02x\n",cpu.A);
 	dprintf("Value of register C : 0x%02x\n",cpu.C);
-
-	setSUBflags(cpu.A,cpu.C);
-	cpu.A -= cpu.C;
+	
+	result = cpu.A - cpu.C;
+	setSUBflags(cpu.A,cpu.C,result);
+	cpu.A = result;
 
 	dprintf("Value of register A after : 0x%02x\n",cpu.A);
 }
@@ -335,9 +339,10 @@ void opcd_sub_u8(){
 
 	dprintf("Value of register A before: 0x%02x\n",cpu.A);
 	dprintf("Value of u8: 0x%02x\n",u8);
-
-	cpu.A -= u8;
-	setSUBflags(cpu.A,u8);
+	
+	result = cpu.A - u8;
+	setSUBflags(cpu.A,u8,result);
+	cpu.A = result;
 
 	dprintf("Value of register A after : 0x%02x\n",cpu.A);
 }
@@ -360,4 +365,25 @@ void opcd_and_u8(){
 	dprintf("Value of register A after : 0x%08b\n",cpu.A);
 
 
+}
+
+void opcd_adc_a_u8(){
+	// ADC A,u8
+	// Add u8 and C flag to A
+	// Set Z flags, N = 0, H and C
+
+	dprintf("ADC A,u8\n");
+
+	u8 = memory_read(++cpu.PC);
+	dprintf("u8 : 0x%02x\n",u8);
+
+	dprintf("ADC A, 0x%02x\n",u8);
+
+	dprintf("Value of Register A before: 0x%02x\n",cpu.A);
+	result = cpu.A + getC() + u8;
+	setADCflags(cpu.A,u8,getC(),result);
+
+	cpu.A = result;
+
+	dprintf("Value of Register A after: 0x%02x\n",cpu.A);
 }

@@ -21,5 +21,6 @@ void opcd_cp_a_hl();
 void opcd_cp_c();
 void opcd_sub_u8();
 void opcd_and_u8();
+void opcd_adc_a_u8();
 
 #endif /* CPU_ALU_H */

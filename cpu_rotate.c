@@ -43,19 +43,21 @@ void opcd_rra(){
 	setc(cpu.A & 0x01); //set the carry flag to the lsb
 
 	cpu.A >>= 1; // Shift by 1 bit
+	dprintf("A shifted right by 1: 0b%08b\n",cpu.A);
 
 	buffer <<= 7;
 	dprintf("buffer after shifting 0b%08b\n",buffer);
-	buffer = buffer | 0b01111111;
-	dprintf("buffer after OR'ing   0b%08b\n",buffer);
+	//buffer = buffer | 0b01111111;
+	//dprintf("buffer after OR'ing   0b%08b\n",buffer);
 
-	cpu.A = cpu.A & buffer; // set the MSB to 0
+	cpu.A = cpu.A | buffer; // set the MSB to 0
 
 	setz(0);
 	setn(0);
 	seth(0);
 
 	dprintf("value of register A after is : 0b%08b\n",cpu.A);
+
 }
 
 void opcd_rl_c(){
@@ -90,37 +92,35 @@ void opcd_rl_c(){
 }
 
 void opcd_rr_c(){
-		// RR C
-		// Rotate the values of C with the C flag
-		// i.e just shift the values to the right
-		// and the value of C goes into MSB and
-		// LSB into the C flag
+	// RR C
+	// Rotate the values of C with the C flag
+	// i.e just shift the values to the right
+	// and the value of C goes into MSB and
+	// LSB into the C flag
 
-		dprintf("RR C\n");
+	dprintf("RR C\n");
 
-		buffer = getC();
-		dprintf("C(buffer) is:0b%08b\n",buffer);
+	buffer = getC();
+	dprintf("C flag(buffer) is:0b%b\n",buffer);
 
-		dprintf("value of register C before is : 0b%08b\n",cpu.C);
+	dprintf("value of register C before is : 0b%08b\n",cpu.C);
 
-		setc(cpu.C & 0x01); //set the carry flag to the lsb
+	setc(cpu.C & 0x01); //set the carry flag to the lsb
 
-		cpu.C >>= 1; // Shift by 1 bit
+	cpu.C >>= 1; // Shift by 1 bit
 
-		buffer <<= 7;
-		dprintf("buffer after shifting 0b%08b\n",buffer);
-		buffer = buffer | 0b01111111;
-		dprintf("buffer after OR'ing   0b%08b\n",buffer);
+	buffer <<= 7;
+	dprintf("buffer after shifting 0b%08b\n",buffer);
+	//buffer = buffer | 0b01111111;
+	//dprintf("buffer after OR'ing   0b%08b\n",buffer);
 
-		cpu.C = cpu.C & buffer; // set the MSB to 0
+	cpu.C = cpu.C | buffer; // set the MSB to 0
 
-		setz(cpu.C == 0);
-		setn(0);
-		seth(0);
+	setz(cpu.C == 0);
+	setn(0);
+	seth(0);
 
-		dprintf("value of register C after is : 0b%08b\n",cpu.C);
-
-
+	dprintf("value of register C after is : 0b%08b\n",cpu.C);
 }
 
 void opcd_rr_d(){
@@ -143,10 +143,8 @@ void opcd_rr_d(){
 
 		buffer <<= 7;
 		dprintf("buffer after shifting 0b%08b\n",buffer);
-		buffer = buffer | 0b01111111;
-		dprintf("buffer after OR'ing   0b%08b\n",buffer);
 
-		cpu.D = cpu.D & buffer; // set the MSB to 0
+		cpu.D = cpu.D | buffer; // set the MSB to 0
 
 		setz(cpu.D == 0);
 		setn(0);
@@ -157,10 +155,10 @@ void opcd_rr_d(){
 }
 
 void opcd_rr_e(){
-		// RR D
-		// Rotate the values of D with the C flag
+		// RR E
+		// Rotate the values of E with the C flag
 		// i.e just shift the values to the right
-		// and the value of D goes into MSB and
+		// and the value of E goes into MSB and
 		// LSB into the C flag
 
 		dprintf("RR E\n");
@@ -176,10 +174,8 @@ void opcd_rr_e(){
 
 		buffer <<= 7;
 		dprintf("buffer after shifting 0b%08b\n",buffer);
-		buffer = buffer | 0b01111111;
-		dprintf("buffer after OR'ing   0b%08b\n",buffer);
 
-		cpu.E = cpu.E & buffer; // set the MSB to 0
+		cpu.E = cpu.E | buffer; // set the MSB to 0
 
 		setz(cpu.E == 0);
 		setn(0);

@@ -44,7 +44,7 @@ extern unsigned short seventh_bit;
 extern uint8_t addr;
 extern int8_t signed_offset;
 extern unsigned short buffer;
-extern uint8_t result;
+extern uint16_t result;
 
 extern uint16_t AF;
 extern uint16_t BC;

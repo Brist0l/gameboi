@@ -7,13 +7,14 @@
 void opcd_inc_bc(){
 	// INC BC
 	// lenght is 1 byte
+	// no flags are changed
 
 	dprintf("INC BC\n");
 
 	dprintf("Value of Register BC before: 0x%04x\n",getBC());
 
 	result = getBC() + 1;
-	setINCflags(getBC(),result);
+	//setINCflags(getBC(),result);
 
 	setBC(result);
 
@@ -111,7 +112,7 @@ void opcd_inc_de(){
 	dprintf("Value of Register DE before: 0x%04x\n",getDE());
 
 	result = getDE() + 1;
-	setINCflags(getDE(),result);
+	//setINCflags(getDE(),result);
 	setDE(result);
 
 	dprintf("Value of Register DE after: 0x%04x\n",getDE());
@@ -182,6 +183,7 @@ void opcd_inc_hl(){
 	// INC HL
 	// lenght is 1 byte
 	// Add 1 to HL
+	// NO FLAGS ARE CHANGED
 
 	dprintf("INC HL\n");
 
@@ -190,7 +192,7 @@ void opcd_inc_hl(){
 	dprintf("L Register before: 0x%02x\n",cpu.L);
 
 	result = getHL() + 1;
-	setINCflags(getHL(),result);
+	//setINCflags(getHL(),result);
 
 	setHL(result);
 

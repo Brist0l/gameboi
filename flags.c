@@ -99,8 +99,8 @@ void setADDflags(uint8_t a,uint8_t b,uint8_t result){
 	setc(((uint16_t)a + (uint16_t)b) > 0xFF);
 }
 
-void setADCflags(uint8_t a,uint8_t b,uint8_t c){
-	if(a == 0)
+void setADCflags(uint8_t a,uint8_t b,uint8_t c,uint8_t result){
+	if(result == 0)
 		setz(1);
 	else
 		setz(0);
@@ -110,8 +110,8 @@ void setADCflags(uint8_t a,uint8_t b,uint8_t c){
 	setc(((uint16_t)a + (uint16_t)b + c) > 0xFF);
 }
 
-void setSUBflags(uint8_t a,uint8_t b){
-	if(a == 0)
+void setSUBflags(uint8_t a,uint8_t b,uint8_t result){
+	if(result == 0)
 		setz(1);
 	else
 		setz(0);

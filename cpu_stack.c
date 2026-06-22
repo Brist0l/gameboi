@@ -22,7 +22,6 @@ void opcd_pop_bc(){
 }
 
 void opcd_push_bc(){
-
 	// PUSH BC
 	// lenght is 1 byte
 	// PUSH's the value which is in BC
@@ -74,7 +73,7 @@ void opcd_push_de(){
 	// PUSH's the value which is in DE
 	// and decrements the SP twice
 
-	printf("PUSH DE\n");
+	dprintf("PUSH DE\n");
 	DE = getDE();
 
 	dprintf("SP val before: 0x%04x\n",cpu.SP);
@@ -111,7 +110,7 @@ void opcd_pop_hl(){
 
 	u16 = (msb << 8) | lsb;
 
-	setHL(u16);
+	setHL(u16 );
 
 	dprintf("Value of register HL : 0x%04x\n",getHL());
 	dprintf("SP after: 0x%04x\n",cpu.SP);

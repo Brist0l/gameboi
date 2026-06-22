@@ -2,6 +2,7 @@
 #define CPU_LD_H
 
 void opcd_ld_bc_u16();
+void opcd_ld_bc_a();
 void opcd_ld_b_u8();
 void opcd_ld_b_b();
 void opcd_ld_c_u8();
