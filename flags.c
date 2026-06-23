@@ -121,6 +121,18 @@ void setSUBflags(uint8_t a,uint8_t b,uint8_t result){
 	setc(a < b);
 }
 
+void setSBCflags(uint8_t a,uint8_t b,uint8_t c,uint8_t result){
+	if(result == 0)
+		setz(1);
+	else
+		setz(0);
+
+	setn(1);
+	seth((a & 0xF) < ((b & 0xF) + c));
+
+	setc(a < (b + c));
+}
+
 void setINCflags(uint8_t r,uint8_t result){
 	if(result == 0)
 		setz(1);
@@ -141,7 +153,7 @@ void setDECflags(uint8_t r,uint8_t result){
 	seth((r & 0xF)  < 1);
 }
 
-void setORflags(uint8_t r,uint8_t result){
+void setORflags(uint8_t result){
 	if(result == 0)
 		setz(1);
 	else

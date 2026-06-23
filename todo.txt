@@ -9,4 +9,6 @@
 like with cpu_ld
 ---DONE---
 => fix the RR n implemenations
-
+---DONE---
+=> Make the serial I/O write to a file
+=> Take in runtime arguments

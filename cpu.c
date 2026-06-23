@@ -409,6 +409,13 @@ void execute(){
 
 			opcd_dec_at_hl();
 			break;
+		
+		case 0x36:
+			// LD (HL), u8
+			// Store u8 at the address of HL
+			
+			opcd_ld_hl_u8();
+			break;
 
 		case 0x38:
 			// JR C, u8
@@ -1283,6 +1290,17 @@ void execute(){
 			opcd_ret_c();
 			break;
 
+		case 0xde:
+			// SBC A, u8
+			// Subtract register A , u8 and carry
+			// flag and store in A
+			// Z = set
+			// N = 1
+			// H , C = set
+
+			opcd_sbc_a_u8();
+			break;
+
 		case 0xe0:
 			// LOAD (FF00 + u8),A
 			// lenght is 2 bytes
@@ -1415,27 +1433,15 @@ void execute(){
 			// lenght is 1 byte
 			// PUSH's the value which is in AF
 			// and decrements the SP twice
+				
+			opcd_push_af();
+			break;
+		
+		case 0xf6:
+			// OR u8
+			// OR u8 with A and store in A
 
-			dprintf("PUSH AF\n");
-			AF = getAF();
-
-			dprintf("SP val before: 0x%04x\n",cpu.SP);
-			dprintf("Value of Register AF is 0x%04x\n",AF);
-
-			lsb = AF & 0x00ff; 	  // C
-			msb = (AF & 0xff00) >> 8; // B
-
-			push(msb);
-			push(lsb);
-
-			dprintf("Pushed 0x%02x to stack\n",lsb);
-			dprintf("Pushed 0x%02x to stack\n",msb);
-
-			dprintf("stack: \n0x%02x\n0x%02x\n",msb,lsb);
-
-			dprintf("Pushed 0x%04x to stack\n",AF);
-			dprintf("SP val after: 0x%04x\n",cpu.SP);
-
+			opcd_or_u8();
 			break;
 
 		case 0xfa:
@@ -1483,7 +1489,7 @@ void execute(){
 		default:
 			//sleep(2);true
     			printf(
-        		"[%lld] UNIMPLEMENTED OPCODE %02x at PC=0x%04x\n",
+        		"[%lld] UNIMPLEMENTED OPCODE 0x%02x at PC=0x%04x\n",
 			instr_cnt,
         		opcode,
         		cpu.PC

@@ -9,6 +9,7 @@ void opcd_add_a_a();
 void opcd_sub_a_b();
 void opcd_sub_a_c();
 void opcd_or_b();
+void opcd_or_u8();
 void opcd_or_c();
 void opcd_or_hl();
 void opcd_or_a();
@@ -20,6 +21,7 @@ void opcd_add_a_u8();
 void opcd_cp_a_hl();
 void opcd_cp_c();
 void opcd_sub_u8();
+void opcd_sbc_a_u8();
 void opcd_and_u8();
 void opcd_adc_a_u8();
 

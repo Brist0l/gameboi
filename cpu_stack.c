@@ -49,6 +49,34 @@ void opcd_push_bc(){
 	dprintf("SP val after: 0x%04x\n",cpu.SP);
 }
 
+void opcd_push_af(){
+	// PUSH AF
+	// lenght is 1 byte
+	// PUSH's the value which is in AF
+	// and decrements the SP twice
+
+	dprintf("PUSH AF\n");
+
+	AF = getAF();
+
+	dprintf("SP val before: 0x%04x\n",cpu.SP);
+	dprintf("Value of Register AF is 0x%04x\n",AF);
+
+	lsb = AF & 0x00ff; 	  // F
+	msb = (AF & 0xff00) >> 8; // A
+
+	push(msb);
+	push(lsb);
+
+	dprintf("Pushed 0x%02x to stack\n",lsb);
+	dprintf("Pushed 0x%02x to stack\n",msb);
+
+	dprintf("stack: \n0x%02x\n0x%02x\n",msb,lsb);
+
+	dprintf("Pushed 0x%04x to stack\n",AF);
+	dprintf("SP val after: 0x%04x\n",cpu.SP);
+}
+
 void opcd_pop_de(){
 	// POP DE
 	// lenght is 1 byte

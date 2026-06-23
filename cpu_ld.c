@@ -250,6 +250,26 @@ void opcd_ld_hl_e(){
 	dprintf("memory at HL after: 0x%02x\n",memory_read(getHL()));
 }
 
+void opcd_ld_hl_u8(){
+	// LOAD (HL), u8
+	// lenght is 1 byte
+	// put data u8 at the memory location of HL
+
+	dprintf("LD (HL), u8\n");
+
+	dprintf("HL Register : 0x%04x\n",getHL());
+	u8 = memory_read(++cpu.PC);
+	dprintf("u8: 0x%02x\n",u8);
+	dprintf("LD (HL), 0x%02x\n",u8);
+	dprintf("memory at HL before: 0x%02x\n",memory_read(getHL()));
+
+	HL = getHL();
+
+	memory_write(HL,u8);
+
+	dprintf("memory at HL after: 0x%02x\n",memory_read(getHL()));
+}
+
 void opcd_ld_h_u8(){
 	// LOAD H,u8
 	// lenght is 2 bytes

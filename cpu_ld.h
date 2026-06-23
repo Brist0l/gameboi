@@ -15,6 +15,7 @@ void opcd_ld_e_u8();
 void opcd_ld_hl_u16();
 void opcd_ld_hlplus_a();
 void opcd_ld_hl_e();
+void opcd_ld_hl_u8();
 void opcd_ld_h_u8();
 void opcd_ld_a_hlplus();
 void opcd_ld_l_u8();

@@ -137,7 +137,27 @@ void opcd_or_b(){
 	dprintf("A Register value before: 0b%08b\n",cpu.A);
 	dprintf("B Register value: 0b%08b\n",cpu.B);
 	result = cpu.A | cpu.B;
-	setORflags(cpu.A,result);
+	setORflags(result);
+
+	cpu.A = result;
+	dprintf("A Register value after: 0x%08b\n",cpu.A);
+
+}
+
+void opcd_or_u8(){
+	// OR u8
+	// ALU operation
+	// lenght is 1 byte
+	// OR's the value u8 with A and stores in A
+
+	dprintf("OR u8\n");
+
+	dprintf("A Register value before: 0b%08b\n",cpu.A);
+	u8 = memory_read(++cpu.PC);
+	dprintf("Value of u8 : 0x%02x\n",u8);
+
+	result = cpu.A | u8;
+	setORflags(result);
 
 	cpu.A = result;
 	dprintf("A Register value after: 0x%08b\n",cpu.A);
@@ -154,7 +174,7 @@ void opcd_or_c(){
 	dprintf("A Register value before: 0b%08b\n",cpu.A);
 	dprintf("C Register value: 0b%08b\n",cpu.C);
 	result = cpu.A | cpu.C;
-	setORflags(cpu.A,result);
+	setORflags(result);
 
 	cpu.A = result;
 	dprintf("A Register value after: 0x%08b\n",cpu.A);
@@ -173,7 +193,7 @@ void opcd_or_hl(){
 
 	result = cpu.A | memory_read(getHL());
 
-	setORflags(cpu.A,result);
+	setORflags(result);
 	cpu.A = result;
 
 	dprintf("A Register value after: 0x%08b\n",cpu.A);
@@ -189,7 +209,7 @@ void opcd_or_a(){
 	dprintf("OR A\n");
 	dprintf("A Register value before: 0b%08b\n",cpu.A);
 	result = cpu.A | cpu.A;
-	setORflags(cpu.A,result);
+	setORflags(result);
 
 	cpu.A = result;
 	dprintf("A Register value after: 0x%08b\n",cpu.A);
@@ -342,6 +362,28 @@ void opcd_sub_u8(){
 	
 	result = cpu.A - u8;
 	setSUBflags(cpu.A,u8,result);
+	cpu.A = result;
+
+	dprintf("Value of register A after : 0x%02x\n",cpu.A);
+}
+
+void opcd_sbc_a_u8(){
+	// SBC A, u8
+	// Subtract register A , u8 and carry
+	// flag and store in A
+	// Z = set
+	// N = 1
+	// H , C = set
+
+	dprintf("SBC A, u8\n");
+
+	u8 = memory_read(++cpu.PC);
+
+	dprintf("Value of register A before: 0x%02x\n",cpu.A);
+	dprintf("Value of u8: 0x%02x\n",u8);
+	
+	result = cpu.A - u8 - getC();
+	setSBCflags(cpu.A,u8,getC(),result);
 	cpu.A = result;
 
 	dprintf("Value of register A after : 0x%02x\n",cpu.A);
