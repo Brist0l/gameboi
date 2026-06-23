@@ -99,6 +99,12 @@ void setADDflags(uint8_t a,uint8_t b,uint8_t result){
 	setc(((uint16_t)a + (uint16_t)b) > 0xFF);
 }
 
+void setADD16flags(uint16_t a,uint16_t b){
+	setn(0);
+	seth(((a & 0x0FFF) + (b & 0x0FFF)) > 0xFFF);
+	setc(((uint32_t)a + (uint32_t)b) > 0xFFFF);
+}
+
 void setADCflags(uint8_t a,uint8_t b,uint8_t c,uint8_t result){
 	if(result == 0)
 		setz(1);

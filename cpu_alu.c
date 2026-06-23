@@ -12,16 +12,65 @@ void opcd_add_hl_hl(){
 
 	dprintf("ADD HL, HL");
 	dprintf("Value of Register HL before: 0x%04x\n",getHL());
-	
-	setn(0);
-	seth(((getHL() & 0x0FFF) + (getHL() & 0x0FFF)) > 0xFFF);
-	setc(((uint32_t)getHL() + (uint32_t)getHL()) > 0xFFFF);
+
+	setADD16flags(getHL(),getHL());
 
 	setHL(getHL() + getHL());
 
 	dprintf("Value of Register HL after: 0x%04x\n",getHL());
 
 
+}
+
+void opcd_add_hl_bc(){
+	// ADD HL,BC
+	// lenght is 1 byte
+	// Add HL to BC and store in HL
+	// Zero flag ain't changed
+
+	dprintf("ADD HL, BC");
+	dprintf("Value of Register HL before: 0x%04x\n",getHL());
+	dprintf("Value of Register BC before: 0x%04x\n",getBC());
+	
+	setADD16flags(getHL(),getBC());
+
+	setHL(getHL() + getBC());
+
+	dprintf("Value of Register HL after: 0x%04x\n",getHL());
+}
+
+void opcd_add_hl_de(){
+	// ADD HL,DE
+	// lenght is 1 byte
+	// Add HL to DE and store in HL
+	// Zero flag ain't changed
+
+	dprintf("ADD HL, DE");
+	dprintf("Value of Register HL before: 0x%04x\n",getHL());
+	dprintf("Value of Register DE before: 0x%04x\n",getDE());
+	
+	setADD16flags(getHL(),getDE());
+
+	setHL(getHL() + getDE());
+
+	dprintf("Value of Register HL after: 0x%04x\n",getHL());
+}
+
+void opcd_add_hl_sp(){
+	// ADD HL,SP
+	// lenght is 1 byte
+	// Add HL to SP and store in HL
+	// Zero flag ain't changed
+
+	dprintf("ADD HL, SP");
+	dprintf("Value of Register HL before: 0x%04x\n",getHL());
+	dprintf("Value of Register SP before: 0x%04x\n",cpu.SP);
+	
+	setADD16flags(getHL(),cpu.SP);
+
+	setHL(getHL() + cpu.SP);
+
+	dprintf("Value of Register HL after: 0x%04x\n",getHL());
 }
 
 void opcd_add_a_b(){
@@ -428,4 +477,26 @@ void opcd_adc_a_u8(){
 	cpu.A = result;
 
 	dprintf("Value of Register A after: 0x%02x\n",cpu.A);
+}
+
+void opcd_add_sp_u8(){
+	// ADD SP, s8
+	// lenght is 1 byte
+	// Add u8 to SP and store in SP
+
+	dprintf("ADD SP, s8");
+
+	s8 = memory_read(++cpu.PC);
+
+	dprintf("Value of Register SP before: 0x%04x\n",cpu.SP);
+	dprintf("Value of s8 : 0x%02x\n",s8);
+	
+	result = cpu.SP + s8;
+
+	setADDflags(cpu.SP,s8,result);
+	setz(0);
+
+	cpu.SP = result;
+
+	dprintf("Value of Register SP after: 0x%02x\n",cpu.SP);
 }

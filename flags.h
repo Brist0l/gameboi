@@ -12,6 +12,7 @@ int geth();
 void setc(const unsigned short val);
 int getC();
 void setADDflags(uint8_t a,uint8_t b,uint8_t result);
+void setADD16flags(uint16_t a,uint16_t b);
 void setADCflags(uint8_t a,uint8_t b,uint8_t c,uint8_t result);
 void setSUBflags(uint8_t a,uint8_t b,uint8_t result);
 void setSBCflags(uint8_t a,uint8_t b,uint8_t c,uint8_t result);

@@ -1,5 +1,6 @@
 #include "debug.h"
 #include "cpu.h"
+#include "flags.h"
 #include "registers.h"
 #include "memory.h"
 
@@ -343,6 +344,23 @@ void opcd_ld_sp_u16(){
 	dprintf("SP Register value before: 0x%04x\n",cpu.SP);
 
 	cpu.SP = u16;
+
+	dprintf("SP Register value after: 0x%04x\n",cpu.SP);
+
+}
+
+void opcd_ld_sp_hl(){
+	// LOAD SP, HL
+	// 16-bit load instruction
+	// length is 3 bytes
+	// put the HL in the SP register
+
+	dprintf("LD SP, HL\n");
+
+	dprintf("SP Register value before: 0x%04x\n",cpu.SP);
+	dprintf("HL Register before: 0x%04x\n",getHL());
+
+	cpu.SP = getHL();
 
 	dprintf("SP Register value after: 0x%04x\n",cpu.SP);
 
@@ -1165,6 +1183,33 @@ void opcd_ld_hl_a(){
 
 }
 
+void opcd_ld_hl_sp_u8(){
+	// LOAD HL,SP + s8
+	// lenght is 1 byte
+	// put SP + u8 into HL
+
+	dprintf("LD HL, SP  + u8\n");
+	dprintf("Value of Register HL before : 0x%04x\n",getHL());
+	dprintf("Value of Register SP : 0x%04x\n",cpu.SP);
+	
+	s8 = memory_read(++cpu.PC);
+	dprintf("s8: 0x%02x\n",s8);
+
+	HL = getHL();
+	HL = cpu.SP + s8;
+
+
+	seth(((cpu.SP & 0x0F) + (s8 & 0x0F)) > 0x0F);
+	setc(((cpu.SP & 0xFF) + (s8 & 0xFF)) > 0xFF);
+	setz(0);
+	setn(0);
+
+	setHL(HL);
+
+	dprintf("Value of Register HL after : 0x%04x\n",getHL());
+
+}
+
 void opcd_ld_a_b(){
 	// LOAD A,B
 	// lenght is 1 byte
@@ -1319,6 +1364,35 @@ void opcd_ld_u16_a(){
 
 	dprintf("Value at 0x%04x after: 0x%02x\n",u16,memory[u16]);
 }
+
+void opcd_ld_u16_sp(){
+	// LD u16, SP
+	// lenght is 3 bytes
+	// store the value of SP at memory address u16
+	// lsb -> u16
+	// msb -> u16 + 1
+
+	dprintf("LD u16, SP\n");
+
+	u16 = get_u16();
+
+	dprintf("LD 0x%04x, SP\n",u16);
+
+	lsb = cpu.SP  & 0x00ff; 	  // P
+	msb = (cpu.SP & 0xff00) >> 8; // S
+
+	dprintf("Storing 0x%02x at 0x%04x\n",lsb,u16);
+	dprintf("Storing 0x%02x at 0x%04x\n",lsb,u16 + 1);
+	dprintf("Value at 0x%04x before: 0x%02x\n",u16,memory_read(u16));
+	dprintf("Value at 0x%04x before: 0x%02x\n",u16 + 1,memory_read(u16 +1));
+
+	memory_write(u16, lsb);
+	memory_write(u16 + 1, msb);
+
+	dprintf("Value at 0x%04x after: 0x%02x\n",u16,memory_read(u16));
+	dprintf("Value at 0x%04x after: 0x%02x\n",u16 + 1,memory_read(u16 +1));
+}
+
 
 void opcd_ld_a_ff00_u8(){
 	// LOAD A , (0xFF00 + u8)

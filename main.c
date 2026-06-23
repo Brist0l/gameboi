@@ -20,11 +20,11 @@ int main(){
 	cpu.SP = 0xfffe; // Reference: GB CPU manual (3.2.4 , pg 64)
 
 	int size = getsize("dmg_boot.bin");
-	int size1 = getsize("gb-test-roms/cpu_instrs/individual/04-op\ r,imm.gb");
+	int size1 = getsize("gb-test-roms/cpu_instrs/individual/03-op\ sp,hl.gb");
 
 	//dprintf("dmg_boot ROM size: %d\n",size);
 
-	load_rom("gb-test-roms/cpu_instrs/individual/04-op\ r,imm.gb",size1,0x0);
+	load_rom("gb-test-roms/cpu_instrs/individual/03-op\ sp,hl.gb",size1,0x0);
 	if(boot_rom_enable == true)
 		load_rom("dmg_boot.bin",size,0x0);
 	//load_rom("gb-test-roms/cpu_instrs/cpu_instrs.gb",size1,0x100);

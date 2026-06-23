@@ -27,6 +27,7 @@ void _fillopcode();
 void registerdump();
 void _fillregisters();
 void gb_doc_log();
+void serial_io(char s);
 
 extern bool debug_flag;
 extern bool gb_doc;

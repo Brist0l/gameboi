@@ -133,3 +133,9 @@ void other_log(){
 		,memory_read(cpu.PC+3)
 		);
 }
+
+void serial_io(char s){
+	FILE* f = fopen("logs/serial/serialio3","a");
+	fputc(s,f);
+	fclose(f);
+}

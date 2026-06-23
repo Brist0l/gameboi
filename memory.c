@@ -77,12 +77,13 @@ void memory_write(uint16_t mem_addr,uint8_t val){
 	}
 
     	if(mem_addr == 0xff02 && val == 0x81){
-		serial_data_string[i++] = serial_data;
-		dprintf("0x%x",serial_data);
-		if(serial_data  == 's'){
-        		dprintf("Serial IO: %s\n",serial_data_string);
-			sleep(2);
-		}
+		//serial_data_string[i++] = serial_data;
+		//dprintf("0x%x",serial_data);
+		//if(serial_data  == 's'){
+        		//dprintf("Serial IO: %s\n",serial_data_string);
+			//sleep(2);
+		//}
+		serial_io(serial_data);
 	}
 
 	//if(mem_addr >= 0x9900 && mem_addr <= 0x9940)

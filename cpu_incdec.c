@@ -22,6 +22,24 @@ void opcd_inc_bc(){
 
 }
 
+void opcd_dec_bc(){
+	// DEC BC
+	// lenght is 1 byte
+	// no flags are changed
+
+	dprintf("DEC BC\n");
+
+	dprintf("Value of Register BC before: 0x%04x\n",getBC());
+
+	result = getBC() - 1;
+	//setINCflags(getBC(),result);
+
+	setBC(result);
+
+	dprintf("Value of Register BC after: 0x%04x\n",getBC());
+
+}
+
 void opcd_inc_b(){
 	// INC B
 	// lenght is 1 byte
@@ -119,6 +137,21 @@ void opcd_inc_de(){
 
 }
 
+void opcd_dec_de(){
+	// DEC DE
+	// lenght is 1 byte
+
+	dprintf("DEC DE\n");
+
+	dprintf("Value of Register DE before: 0x%04x\n",getDE());
+
+	result = getDE() - 1;
+	//setINCflags(getDE(),result);
+	setDE(result);
+
+	dprintf("Value of Register DE after: 0x%04x\n",getDE());
+}
+
 void opcd_inc_d(){
 	// INC D
 	// lenght is 1 byte
@@ -202,6 +235,29 @@ void opcd_inc_hl(){
 
 
 }
+
+void opcd_dec_hl(){
+	// DEC HL
+	// lenght is 1 byte
+	// Add 1 to HL
+	// NO FLAGS ARE CHANGED
+
+	dprintf("DEC HL\n");
+
+	dprintf("HL Register before: 0x%04x\n",getHL());
+	dprintf("H Register before: 0x%02x\n",cpu.H);
+	dprintf("L Register before: 0x%02x\n",cpu.L);
+
+	result = getHL() - 1;
+	//setINCflags(getHL(),result);
+
+	setHL(result);
+
+	dprintf("HL Register after: 0x%04x\n",getHL());
+	dprintf("H Register after: 0x%02x\n",cpu.H);
+	dprintf("L Register after: 0x%02x\n",cpu.L);
+}
+
 
 void opcd_inc_h(){
 	// INC H
@@ -300,4 +356,28 @@ void opcd_dec_a(){
 
 	dprintf("Value of register A after is: 0x%02x\n",cpu.A);
 
+}
+
+void opcd_dec_sp(){
+	// DEC SP
+	
+	dprintf("DEC SP\n");
+
+	dprintf("Value of register SP before is: 0x%02x\n",cpu.SP);
+
+	cpu.SP -= 1;
+
+	dprintf("Value of register SP after is: 0x%02x\n",cpu.SP);
+}
+
+void opcd_inc_sp(){
+	// INC SP
+	
+	dprintf("INC SP\n");
+
+	dprintf("Value of register SP before is: 0x%02x\n",cpu.SP);
+
+	cpu.SP += 1;
+
+	dprintf("Value of register SP after is: 0x%02x\n",cpu.SP);
 }

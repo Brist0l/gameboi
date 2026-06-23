@@ -48,7 +48,8 @@ struct registers cpu;
 unsigned short msb;
 unsigned short lsb;
 unsigned short u16;
-unsigned short u8;
+uint8_t u8;
+int8_t  s8;
 unsigned short seventh_bit;
 uint8_t addr;
 int8_t signed_offset;
@@ -110,6 +111,7 @@ void execute(){
 
 			dprintf("NOP\n");
 			break;
+
 		case 0x01:
 			// LD BC, u16
 			// lenght is 3 bytes
@@ -151,6 +153,26 @@ void execute(){
 			// Put u8 into B
 
 			opcd_ld_b_u8();
+			break;
+		
+		case 0x08:
+			// LD u16 , SP
+			// Put the SP at the addr u16
+
+			opcd_ld_u16_sp();
+			break;
+
+		case 0x09:
+			// ADD HL,BC
+			// add BC to HL and store it again in HL
+
+			opcd_add_hl_bc();
+			break;
+
+		case 0x0b:
+			// DEC BC
+
+			opcd_dec_bc();
 			break;
 
 		case 0x0c:
@@ -236,12 +258,24 @@ void execute(){
 			opcd_jr_u8();
 			break;
 
+		case 0x19:
+			// ADD HL, DE
+
+			opcd_add_hl_de();
+			break;
+
 		case 0x1a:
 			// LOAD A,(DE)
 			// lenght is 1 byte
 			// put contents at addr specified by DE into A
 
 			opcd_ld_a_de();
+			break;
+
+		case 0x1b:
+			// DEC DE
+
+			opcd_dec_de();
 			break;
 
 		case 0x1c:
@@ -347,12 +381,19 @@ void execute(){
 
 			opcd_add_hl_hl();
 			break;
+
 		case 0x2a:
 			// LOAD A,(HL+)
 			// lenght is 1 byte
 			// put data at HL into  A and increment HL
 
 			opcd_ld_a_hlplus();
+			break;
+
+		case 0x2b:
+			// DEC HL
+
+			opcd_dec_hl();
 			break;
 
 		case 0x2c:
@@ -368,7 +409,6 @@ void execute(){
 
 			opcd_dec_l();
 			break;
-
 
 		case 0x2e:
 			// LOAD L , u8
@@ -402,6 +442,12 @@ void execute(){
 
 			opcd_ld_hlminus_a();
 			break;
+		
+		case 0x33:
+			// INC SP
+
+			opcd_inc_sp();
+			break;
 
 		case 0x35:
 			// DEC (HL)
@@ -409,11 +455,11 @@ void execute(){
 
 			opcd_dec_at_hl();
 			break;
-		
+
 		case 0x36:
 			// LD (HL), u8
 			// Store u8 at the address of HL
-			
+
 			opcd_ld_hl_u8();
 			break;
 
@@ -423,6 +469,18 @@ void execute(){
 			// lenght is 2 bytes
 
 			opcd_jr_c_u8();
+			break;
+
+		case 0x39:
+			// ADD HL, SP
+
+			opcd_add_hl_sp();
+			break;
+
+		case 0x3b:
+			// DEC SP
+
+			opcd_dec_sp();
 			break;
 
 		case 0x3c:
@@ -1345,6 +1403,13 @@ void execute(){
 
 			opcd_and_u8();
 			break;
+		
+		case 0xe8:
+			// ADD SP, u8
+			// add u8 into SP
+
+			opcd_add_sp_u8();
+			break;
 
 		case 0xe9:
 			// JP HL
@@ -1433,15 +1498,28 @@ void execute(){
 			// lenght is 1 byte
 			// PUSH's the value which is in AF
 			// and decrements the SP twice
-				
+
 			opcd_push_af();
 			break;
-		
+
 		case 0xf6:
 			// OR u8
 			// OR u8 with A and store in A
 
 			opcd_or_u8();
+			break;
+
+		case 0xf8:
+			// LD HL, SP + u8
+
+			opcd_ld_hl_sp_u8();
+			break;
+
+		case 0xf9:
+			// LD SP, HL
+			// Put HL in SP
+
+			opcd_ld_sp_hl();
 			break;
 
 		case 0xfa:
@@ -1508,7 +1586,7 @@ void execute(){
 	if(gb_doc == true)
 		gb_doc_log();
 
-	//if(instr_cnt == 31581)
+	//if(instr_cnt == 730268)
 		//exit(1);
 
 	dprintf("\nRegister PC after: 0x%04x\n",cpu.PC);

@@ -2,6 +2,10 @@
 #define CPU_ALU_H
 
 void opcd_add_hl_hl();
+void opcd_add_hl_bc();
+void opcd_add_hl_de();
+void opcd_add_hl_sp();
+void opcd_add_sp_u8();
 void opcd_add_a_b();
 void opcd_add_a_c();
 void opcd_add_a_hl();
