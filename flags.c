@@ -200,3 +200,10 @@ void setSWAPflags(uint8_t r){
 	setc(0);
 
 }
+
+void setCPflags(uint8_t a, uint8_t b){
+	setz((a - b) == 0);
+	setn(1);
+	seth((a & 0xF) < (b & 0xF));
+	setc(a < b);
+}

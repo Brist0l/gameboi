@@ -3,8 +3,6 @@
 #include<stdlib.h>
 #include<unistd.h>
 
-#define GET7BIT 0b10000000
-
 #include "cpu.h"
 #include "cpu_ld.h"
 #include "cpu_jump.h"
@@ -13,6 +11,7 @@
 #include "cpu_rotate.h"
 #include "cpu_stack.h"
 #include "cpu_shift.h"
+#include "cpu_misc.h"
 #include "registers.h"
 #include "flags.h"
 
@@ -154,7 +153,13 @@ void execute(){
 
 			opcd_ld_b_u8();
 			break;
-		
+
+		case 0x07:
+			// RLCA
+
+			opcd_rlca();
+			break;
+
 		case 0x08:
 			// LD u16 , SP
 			// Put the SP at the addr u16
@@ -196,6 +201,12 @@ void execute(){
 			// Put the values of u8 into C
 
 			opcd_ld_c_u8();
+			break;
+
+		case 0x0f:
+			// RRCA
+
+			opcd_rrca();
 			break;
 
 		case 0x11:
@@ -315,6 +326,7 @@ void execute(){
 			// lenght is 2 bytes
 			// if Z flag is 0:
 			// jump relative to (current_addr + addr)
+
 			opcd_jr_nz_u8();
 			break;
 
@@ -418,6 +430,15 @@ void execute(){
 			opcd_ld_l_u8();
 			break;
 
+		case 0x2f:
+			// CPL
+			// Take the one's complement
+			// (i.e., flip all bits) of the
+			// contents of register A.
+
+			opcd_cpl();
+			break;
+
 		case 0x30:
 			// JR NC, u8
 			// JUMP relative if NotC to (current addr + n)
@@ -442,7 +463,7 @@ void execute(){
 
 			opcd_ld_hlminus_a();
 			break;
-		
+
 		case 0x33:
 			// INC SP
 
@@ -461,6 +482,13 @@ void execute(){
 			// Store u8 at the address of HL
 
 			opcd_ld_hl_u8();
+			break;
+
+		case 0x37:
+			// SCF
+			// Set the Carry flag to 1
+
+			opcd_scf();
 			break;
 
 		case 0x38:
@@ -502,6 +530,12 @@ void execute(){
 			// lenght is 2 bytes
 
 			opcd_ld_a_u8();
+			break;
+
+		case 0x3f:
+			// CCF
+
+			opcd_ccf();
 			break;
 
 		case 0x40:
@@ -964,6 +998,31 @@ void execute(){
 			opcd_add_a_c();
 			break;
 
+		case 0x82:
+			// ADD A, D
+
+			opcd_add_a_d();
+			break;
+
+		case 0x83:
+			// ADD A, E
+
+			opcd_add_a_e();
+			break;
+
+		case 0x84:
+			// ADD A, H
+
+			opcd_add_a_h();
+			break;
+
+		case 0x85:
+			// ADD A, L
+
+			opcd_add_a_l();
+			break;
+
+
 		case 0x86:
 			// ADD A,(HL)
 			// lenght is 1 byte
@@ -979,6 +1038,54 @@ void execute(){
 			// Add A to A and store in A
 
 			opcd_add_a_a();
+			break;
+
+		case 0x88:
+			// ADC A,B
+
+			opcd_adc_a_b();
+			break;
+
+		case 0x89:
+			// ADC A,C
+
+			opcd_adc_a_c();
+			break;
+
+		case 0x8a:
+			// ADC A,D
+
+			opcd_adc_a_d();
+			break;
+
+		case 0x8b:
+			// ADC A,E
+
+			opcd_adc_a_e();
+			break;
+
+		case 0x8c:
+			// ADC A,H
+
+			opcd_adc_a_h();
+			break;
+
+		case 0x8d:
+			// ADC A,L
+
+			opcd_adc_a_l();
+			break;
+
+		case 0x8e:
+			// ADC A,(HL)
+
+			opcd_adc_a_hl();
+			break;
+
+		case 0x8f:
+			// ADC A. A
+
+			opcd_adc_a_a();
 			break;
 
 		case 0x90:
@@ -997,6 +1104,144 @@ void execute(){
 			opcd_sub_a_c();
 			break;
 
+		case 0x92:
+			// SUB D
+
+			opcd_sub_a_d();
+			break;
+
+		case 0x93:
+			// SUB E
+
+			opcd_sub_a_e();
+			break;
+
+		case 0x94:
+			// SUB H
+
+			opcd_sub_a_h();
+			break;
+
+		case 0x95:
+			// SUB L
+
+			opcd_sub_a_l();
+			break;
+
+		case 0x96:
+			// SUB (HL)
+
+			opcd_sub_a_hl();
+			break;
+
+		case 0x97:
+			// SUB A
+
+			opcd_sub_a_a();
+			break;
+
+		case 0x98:
+			// SBC A, B
+
+			opcd_sbc_a_b();
+			break;
+
+		case 0x99:
+			// SBC A, C
+
+			opcd_sbc_a_c();
+			break;
+
+		case 0x9a:
+			// SBC A, D
+
+			opcd_sbc_a_d();
+			break;
+
+		case 0x9b:
+			// SBC A, E
+
+			opcd_sbc_a_e();
+			break;
+
+		case 0x9c:
+			// SBC A, H
+
+			opcd_sbc_a_h();
+			break;
+
+		case 0x9d:
+			// SBC A, L
+
+			opcd_sbc_a_l();
+			break;
+
+		case 0x9e:
+			// SBC A , (HL)
+
+			opcd_sbc_a_hl();
+			break;
+
+		case 0x9f:
+			// SBC A, A
+
+			opcd_sbc_a_a();
+			break;
+
+		case 0xa0:
+			// AND B
+
+			opcd_and_b();
+			break;
+
+		case 0xa1:
+			// AND C
+
+			opcd_and_c();
+			break;
+
+		case 0xa2:
+			// AND D
+
+			opcd_and_d();
+			break;
+
+		case 0xa3:
+			// AND E
+
+			opcd_and_e();
+			break;
+
+		case 0xa4:
+			// AND H
+
+			opcd_and_h();
+			break;
+
+		case 0xa5:
+			// AND L
+
+			opcd_and_l();
+			break;
+
+		case 0xa6:
+			// AND (HL)
+
+			opcd_and_hl();
+			break;
+
+		case 0xa7:
+			// AND A
+
+			opcd_and_a();
+			break;
+
+		case 0xa8:
+			// XOR B
+
+			opcd_xor_b();
+			break;
+
 		case 0xa9:
 			// XOR C
 			// ALU operation
@@ -1005,6 +1250,25 @@ void execute(){
 
 			opcd_xor_c();
 			break;
+
+		case 0xaa:
+			// XOR D
+
+			opcd_xor_d();
+			break;
+
+		case 0xab:
+			// XOR E
+
+			opcd_xor_e();
+			break;
+
+		case 0xac:
+			// XOR H
+
+			opcd_xor_h();
+			break;
+
 		case 0xad:
 			// XOR L
 			// ALU operation
@@ -1049,6 +1313,29 @@ void execute(){
 
 			opcd_or_c();
 			break;
+		case 0xb2:
+			// OR D
+
+			opcd_or_d();
+			break;
+
+		case 0xb3:
+			// OR E
+
+			opcd_or_e();
+			break;
+
+		case 0xb4:
+			// OR H
+
+			opcd_or_h();
+			break;
+
+		case 0xb5:
+			// OR L
+
+			opcd_or_l();
+			break;
 
 		case 0xb6:
 			// OR (HL)
@@ -1068,11 +1355,41 @@ void execute(){
 			opcd_or_a();
 			break;
 
+		case 0xb8:
+			// CP B
+
+			opcd_cp_b();
+			break;
+
 		case 0xb9:
 			// CP C
 			// Calculate A - C and set Z flag
 
 			opcd_cp_c();
+			break;
+
+		case 0xba:
+			// CP D
+
+			opcd_cp_d();
+			break;
+
+		case 0xbb:
+			// CP E
+
+			opcd_cp_e();
+			break;
+
+		case 0xbc:
+			// CP H
+
+			opcd_cp_h();
+			break;
+
+		case 0xbd:
+			// CP L
+
+			opcd_cp_l();
 			break;
 
 		case 0xbe:
@@ -1085,6 +1402,12 @@ void execute(){
 			// Z = 1
 
 			opcd_cp_a_hl();
+			break;
+
+		case 0xbf:
+			// CP A
+
+			opcd_cp_a();
 			break;
 
 		case 0xc0:
@@ -1152,6 +1475,108 @@ void execute(){
 			unsigned int nxtbyt = memory_read(++cpu.PC);
 
 			switch(nxtbyt){
+				case 0x00:
+					// RLC B
+
+					opcd_rlc_b();
+					break;
+
+				case 0x01:
+					// RLC C
+
+					opcd_rlc_c();
+					break;
+
+				case 0x02:
+					// RLC D
+
+					opcd_rlc_d();
+					break;
+
+				case 0x03:
+					// RLC E
+
+					opcd_rlc_e();
+					break;
+
+				case 0x04:
+					// RLC H
+
+					opcd_rlc_h();
+					break;
+
+				case 0x05:
+					// RLC L
+
+					opcd_rlc_l();
+					break;
+
+				case 0x06:
+					// RLC (HL)
+
+					opcd_rlc_hl();
+					break;
+
+				case 0x7:
+					// RLC A
+
+					opcd_rlc_a();
+					break;
+
+				case 0x8:
+					// RRC B
+
+					opcd_rrc_b();
+					break;
+
+				case 0x9:
+					// RRC C
+
+					opcd_rrc_c();
+					break;
+
+				case 0xa:
+					// RRC D
+
+					opcd_rrc_d();
+					break;
+
+				case 0xb:
+					// RRC E
+
+					opcd_rrc_e();
+					break;
+
+				case 0xc:
+					// RRC H
+
+					opcd_rrc_h();
+					break;
+
+				case 0xd:
+					// RRC L
+
+					opcd_rrc_l();
+					break;
+
+				case 0xe:
+					// RRC (HL)
+
+					opcd_rrc_hl();
+					break;
+
+				case 0xf:
+					// RRC A
+
+					opcd_rrc_a();
+					break;
+
+				case 0x10:
+					// RL B
+
+					opcd_rl_b();
+					break;
+
 				case 0x11:
 					// RL C
 					// lenght is 2 bytes
@@ -1161,6 +1586,48 @@ void execute(){
 					// out bit to the carry flag
 
 					opcd_rl_c();
+					break;
+
+				case 0x12:
+					// RL D
+
+					opcd_rl_d();
+					break;
+
+				case 0x13:
+					// RL E
+
+					opcd_rl_e();
+					break;
+
+				case 0x14:
+					// RL H
+
+					opcd_rl_h();
+					break;
+
+				case 0x15:
+					// RL L
+
+					opcd_rl_l();
+					break;
+
+				case 0x16:
+					// RL (HL)
+
+					opcd_rl_hl();
+					break;
+
+				case 0x17:
+					// RL A
+
+					opcd_rl_a();
+					break;
+
+				case 0x18:
+					// RR B
+
+					opcd_rr_b();
 					break;
 
 				case 0x19:
@@ -1195,6 +1662,24 @@ void execute(){
 					opcd_rr_e();
 					break;
 
+				case 0x1c:
+					// RR H
+
+					opcd_rr_h();
+					break;
+
+				case 0x1d:
+					// RR L
+
+					opcd_rr_l();
+					break;
+
+				case 0x1e:
+					// RR HL
+
+					opcd_rr_hl();
+					break;
+
 				case 0x1f:
 					// RR A
 					// Rotate the values of A with the C flag
@@ -1203,6 +1688,145 @@ void execute(){
 					// LSB into the C flag
 
 					opcd_rr_a();
+					break;
+
+				case 0x20:
+					// SLA B
+
+					opcd_sla_b();
+					break;
+
+				case 0x21:
+					// SLA C
+
+					opcd_sla_c();
+					break;
+
+				case 0x22:
+					// SLA D
+
+					opcd_sla_d();
+					break;
+
+				case 0x23:
+					// SLA E
+
+					opcd_sla_e();
+					break;
+
+				case 0x24:
+					// SLA H
+
+					opcd_sla_h();
+					break;
+
+				case 0x25:
+					// SLA L
+
+					opcd_sla_l();
+					break;
+
+				case 0x26:
+					// SLA (HL)
+
+					opcd_sla_hl();
+					break;
+
+				case 0x27:
+					// SLA A
+
+					opcd_sla_a();
+					break;
+
+				case 0x28:
+					// SRA B
+
+					opcd_sra_b();
+					break;
+
+				case 0x29:
+					// SRA C
+
+					opcd_sra_c();
+					break;
+
+				case 0x2a:
+					// SRA D
+
+					opcd_sra_d();
+					break;
+
+				case 0x2b:
+					// SRA E
+
+					opcd_sra_e();
+					break;
+
+				case 0x2c:
+					// SRA H
+
+					opcd_sra_h();
+					break;
+
+				case 0x2d:
+					// SRA L
+
+					opcd_sra_l();
+					break;
+
+				case 0x2e:
+					// SRA (HL)
+
+					opcd_sra_hl();
+					break;
+
+				case 0x2f:
+					// SRA A
+
+					opcd_sra_a();
+					break;
+
+				case 0x30:
+					// SWAP B
+
+					opcd_swap_b();
+					break;
+
+				case 0x31:
+					// SWAP C
+
+					opcd_swap_c();
+					break;
+
+				case 0x32:
+					// SWAP D
+
+					opcd_swap_d();
+					break;
+
+				case 0x33:
+					// SWAP E
+
+					opcd_swap_e();
+					break;
+
+				case 0x34:
+					// SWAP H
+
+					opcd_swap_h();
+					break;
+
+				case 0x35:
+					// SWAP L
+
+					opcd_swap_l();
+					break;
+
+				case 0x36:
+					// SWAP (HL)
+					// REDO
+
+					opcd_swap_hl();
 					break;
 
 				case 0x37:
@@ -1218,7 +1842,7 @@ void execute(){
 					// H = 0
 					// C = 0
 
-					opcd_shift_a();
+					opcd_swap_a();
 					break;
 
 				case 0x38:
@@ -1231,6 +1855,42 @@ void execute(){
 					// N and H are set to 0
 
 					opcd_srl_b();
+					break;
+
+				case 0x39:
+					// SRL C
+
+					opcd_srl_c();
+					break;
+
+				case 0x3a:
+					// SRL D
+
+					opcd_srl_d();
+					break;
+
+				case 0x3b:
+					// SRL E
+
+					opcd_srl_e();
+					break;
+
+				case 0x3c:
+					// SRL H
+
+					opcd_srl_h();
+					break;
+
+				case 0x3d:
+					// SRL L
+
+					opcd_srl_l();
+					break;
+
+				case 0x3f:
+					// SRL A
+
+					opcd_srl_a();
 					break;
 
 
@@ -1272,7 +1932,7 @@ void execute(){
 
 				default:
 					printf("NULL RN\n");
-					printf("Opcode to implement: 0x%02x\n",memory_read(cpu.PC));
+					printf("[%lld]Opcode to implement: 0xCB%02x\n",instr_cnt,memory_read(cpu.PC));
 					exit(1);
 
 					break;
@@ -1403,7 +2063,7 @@ void execute(){
 
 			opcd_and_u8();
 			break;
-		
+
 		case 0xe8:
 			// ADD SP, u8
 			// add u8 into SP

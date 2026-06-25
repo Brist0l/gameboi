@@ -2,11 +2,40 @@
 #define CPU_ROTATE_H
 
 void opcd_rla();
+void opcd_rlc_b();
+void opcd_rlc_e();
+void opcd_rlc_a();
+void opcd_rlc_d();
+void opcd_rlc_hl();
+void opcd_rlc_l();
+void opcd_rlc_h();
+void opcd_rlc_c();
+void opcd_rlca();
+void opcd_rrc_c();
+void opcd_rrc_e();
+void opcd_rrc_h();
+void opcd_rrc_l();
+void opcd_rrc_hl();
+void opcd_rrc_a();
+void opcd_rrc_d();
+void opcd_rrc_b();
+void opcd_rrca();
 void opcd_rra();
 void opcd_rl_c();
+void opcd_rl_b();
+void opcd_rl_d();
+void opcd_rl_e();
+void opcd_rl_h();
+void opcd_rl_a();
+void opcd_rl_l();
+void opcd_rl_hl();
 void opcd_rr_c();
 void opcd_rr_d();
-void opcd_rr_e();
+void opcd_rr_b();
 void opcd_rr_a();
+void opcd_rr_h();
+void opcd_rr_l();
+void opcd_rr_hl();
+void opcd_rr_e();
 
 #endif /* CPU_ROTATE_H */

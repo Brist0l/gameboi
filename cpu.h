@@ -3,6 +3,9 @@
 
 #include<stdint.h>
 
+#define GET7BIT 0b10000000
+#define GET0BIT 0b00000001
+
 struct registers{
 	uint8_t A; // Accumulator and Flag
 	uint8_t B;// High register with B and lo with C

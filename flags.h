@@ -22,5 +22,6 @@ void setORflags(uint8_t result);
 void setXORflags(uint8_t r);
 void setANDflags(uint8_t r);
 void setSWAPflags(uint8_t r);
+void setCPflags(uint8_t a, uint8_t b);
 
 #endif /* FLAGS_H */
