@@ -6,6 +6,133 @@
 
 // ├── cpu_jump.c         // JP, JR, CALL, RET, RST
 
+void opcd_rst_0(){
+	// RST 0
+	// Jump to 0x0 and push the current PC 
+	// to the stack
+
+	lsb = (cpu.PC + 1) & 0x00ff;
+	msb = ((cpu.PC + 1) & 0xff00) >> 8;
+
+	dprintf("Storing 0x%04x first\n",msb);
+	push(msb);
+	dprintf("Storing 0x%04x next\n",lsb);
+	push(lsb);
+
+	cpu.PC = 0x0 - 1; // +1 will be done at the end
+}
+
+void opcd_rst_1(){
+	// RST 1
+	// Jump to 0x08 and push the current PC 
+	// to the stack
+
+	lsb = (cpu.PC + 1) & 0x00ff;
+	msb = ((cpu.PC + 1) & 0xff00) >> 8;
+
+	dprintf("Storing 0x%04x first\n",msb);
+	push(msb);
+	dprintf("Storing 0x%04x next\n",lsb);
+	push(lsb);
+
+	cpu.PC = 0x08 - 1; // +1 will be done at the end
+}
+
+void opcd_rst_2(){
+	// RST 2
+	// Jump to 0x10 and push the current PC 
+	// to the stack
+
+	lsb = (cpu.PC + 1) & 0x00ff;
+	msb = ((cpu.PC + 1) & 0xff00) >> 8;
+
+	dprintf("Storing 0x%04x first\n",msb);
+	push(msb);
+	dprintf("Storing 0x%04x next\n",lsb);
+	push(lsb);
+
+	cpu.PC = 0x10 - 1; // +1 will be done at the end
+}
+
+void opcd_rst_3(){
+	// RST 3
+	// Jump to 0x18 and push the current PC 
+	// to the stack
+
+	lsb = (cpu.PC + 1) & 0x00ff;
+	msb = ((cpu.PC + 1) & 0xff00) >> 8;
+
+	dprintf("Storing 0x%04x first\n",msb);
+	push(msb);
+	dprintf("Storing 0x%04x next\n",lsb);
+	push(lsb);
+
+	cpu.PC = 0x18 - 1; // +1 will be done at the end
+}
+
+void opcd_rst_4(){
+	// RST 4
+	// Jump to 0x20 and push the current PC 
+	// to the stack
+
+	lsb = (cpu.PC + 1) & 0x00ff;
+	msb = ((cpu.PC + 1) & 0xff00) >> 8;
+
+	dprintf("Storing 0x%04x first\n",msb);
+	push(msb);
+	dprintf("Storing 0x%04x next\n",lsb);
+	push(lsb);
+
+	cpu.PC = 0x20 - 1; // +1 will be done at the end
+}
+
+void opcd_rst_5(){
+	// RST 5
+	// Jump to 0x28 and push the current PC 
+	// to the stack
+
+	lsb = (cpu.PC + 1) & 0x00ff;
+	msb = ((cpu.PC + 1) & 0xff00) >> 8;
+
+	dprintf("Storing 0x%04x first\n",msb);
+	push(msb);
+	dprintf("Storing 0x%04x next\n",lsb);
+	push(lsb);
+
+	cpu.PC = 0x28 - 1; // +1 will be done at the end
+}
+
+void opcd_rst_6(){
+	// RST 6
+	// Jump to 0x30 and push the current PC 
+	// to the stack
+
+	lsb = (cpu.PC + 1) & 0x00ff;
+	msb = ((cpu.PC + 1) & 0xff00) >> 8;
+
+	dprintf("Storing 0x%04x first\n",msb);
+	push(msb);
+	dprintf("Storing 0x%04x next\n",lsb);
+	push(lsb);
+
+	cpu.PC = 0x30 - 1; // +1 will be done at the end
+}
+
+void opcd_rst_7(){
+	// RST 7
+	// Jump to 0x38 and push the current PC 
+	// to the stack
+
+	lsb = (cpu.PC + 1) & 0x00ff;
+	msb = ((cpu.PC + 1) & 0xff00) >> 8;
+
+	dprintf("Storing 0x%04x first\n",msb);
+	push(msb);
+	dprintf("Storing 0x%04x next\n",lsb);
+	push(lsb);
+
+	cpu.PC = 0x38 - 1; // +1 will be done at the end
+}
 
 void opcd_ret(){
 	// RET
@@ -13,6 +140,26 @@ void opcd_ret(){
 	// POP the stack and put it into the PC
 
 	dprintf("RET\n");
+	dprintf("SP before: 0x%04x\n",cpu.SP);
+
+	lsb = pop(); // P of the PC
+	msb = pop();  // C of the PC
+
+	u16 = (msb << 8) | lsb;
+
+	cpu.PC = u16 - 1;
+
+	dprintf("Value of register PC : 0x%04x\n",cpu.PC + 1);
+	dprintf("SP after: 0x%04x\n",cpu.SP);
+
+}
+
+void opcd_reti(){
+	// RETI
+	// lenght is 1 byte
+	// POP the stack and put it into the PC
+
+	dprintf("RETI\n");
 	dprintf("SP before: 0x%04x\n",cpu.SP);
 
 	lsb = pop(); // P of the PC
@@ -153,6 +300,66 @@ void opcd_jp_u16(){
 	cpu.PC = u16 - 1;
 }
 
+void opcd_jp_z_u16(){
+	// JP Z, u16
+	// JUMP to addr u16 if Z == 1
+	// lenght is 3 bytes
+
+	dprintf("JP Z, u16\n");
+	u16 = get_u16();
+	
+	if(getz() == 1){
+		dprintf("JP (0x%04x)\n",u16);
+
+		cpu.PC = u16 - 1;
+	}
+}
+
+void opcd_jp_nz_u16(){
+	// JP NZ, u16
+	// JUMP to addr u16 if Z == 0
+	// lenght is 3 bytes
+
+	dprintf("JP NZ, u16\n");
+	u16 = get_u16();
+	
+	if(getz() == 0){
+		dprintf("JP (0x%04x)\n",u16);
+
+		cpu.PC = u16 - 1;
+	}
+}
+
+void opcd_jp_nc_u16(){
+	// JP NC, u16
+	// JUMP to addr u16 if C == 0
+	// lenght is 3 bytes
+
+	dprintf("JP NC, u16\n");
+	u16 = get_u16();
+	
+	if(getC() == 0){
+		dprintf("JP (0x%04x)\n",u16);
+
+		cpu.PC = u16 - 1;
+	}
+}
+
+void opcd_jp_c_u16(){
+	// JP C, u16
+	// JUMP to addr u16 if C == 1
+	// lenght is 3 bytes
+
+	dprintf("JP C, u16\n");
+	u16 = get_u16();
+	
+	if(getC() == 1){
+		dprintf("JP (0x%04x)\n",u16);
+
+		cpu.PC = u16 - 1;
+	}
+}
+
 void opcd_call_nz_u16(){
 	// CALL NZ , u16
 	// lenght is 3 bytes
@@ -179,13 +386,64 @@ void opcd_call_nz_u16(){
 
 }
 
+void opcd_call_z_u16(){
+	// CALL Z , u16
+	// lenght is 3 bytes
+
+	dprintf("CALL Z, u16\n");
+	u16 = get_u16();
+	dprintf("Z flag: 0b%b\n",getz());
+
+	if(getz() == 1){
+		//store the current addr to the stack
+		lsb = (cpu.PC + 1) & 0x00ff;
+		msb = ((cpu.PC + 1) & 0xff00) >> 8;
+
+		dprintf("Storing 0x%04x first\n",msb);
+		push(msb);
+		dprintf("Storing 0x%04x next\n",lsb);
+		push(lsb);
+
+		cpu.PC = u16 - 1; // +1 will be done at the end
+
+		dprintf("CALL and Jumping to 0x%04x\n",u16);
+	}
+
+
+}
+
+void opcd_call_c_u16(){
+	// CALL C , u16
+	// lenght is 3 bytes
+
+	dprintf("CALL C, u16\n");
+	u16 = get_u16();
+	dprintf("C flag: 0b%b\n",getC());
+
+	if(getC() == 1){
+		//store the current addr to the stack
+		lsb = (cpu.PC+1) & 0x00ff;
+		msb = ((cpu.PC+1) & 0xff00) >> 8;
+
+		dprintf("Storing 0x%04x first\n",msb);
+		push(msb);
+		dprintf("Storing 0x%04x next\n",lsb);
+		push(lsb);
+
+		cpu.PC = u16 - 1; // +1 will be done at the end
+
+		dprintf("CALL and Jumping to 0x%04x\n",u16);
+	}
+
+
+}
 void opcd_call_nc_u16(){
 	// CALL NC , u16
 	// lenght is 3 bytes
 
 	dprintf("CALL NC, u16\n");
 	u16 = get_u16();
-	printf("C flag: 0b%b\n",getC());
+	dprintf("C flag: 0b%b\n",getC());
 
 	if(getC() == 0){
 		//store the current addr to the stack
@@ -328,17 +586,27 @@ void opcd_jr_nc_u8(){
 
 void opcd_jr_c_u8(){
 	// JR C, u8
-	// JUMP relative if C , to (current addr + n)
+	// JUMP relative if NotC to (current addr + n)
 	// lenght is 2 bytes
+	dprintf("JR C, u8\n");
 
-	addr = memory_read(++cpu.PC);
-	dprintf("Add by: 0x%2x\n",addr);
-	dprintf("Add by: %d\n",addr);
+	signed_offset = memory_read(++cpu.PC);
 
-	addr += cpu.PC + 1; // address is calculated after the instruction hence
-		     // the +1
-	dprintf("Address is: 0x%04x\n",addr);
+	dprintf("Add by(u8) : 0x%2x (0d%d) \n",signed_offset,signed_offset);
 
-	printf("JR C, (0x%04x)\n",addr);
+	//signed_offset += cpu.PC + 1; // address is calculated after the instruction hence
+			   // the +1
+	dprintf("Address is: 0x%04x\n",(cpu.PC + 1) + signed_offset);
+	dprintf("JR C , (0x%04x)\n",(cpu.PC + 1) + signed_offset);
+	dprintf("C : 0b%b\n",getC());
+
+	if(getC() == 1){
+		cpu.PC = (cpu.PC + 1) +  signed_offset - 1; //as a +1 will happen after the end of switch case
+		dprintf("Jumping to 0x%04x\n",cpu.PC + 1);
+	}
+	else{
+		dprintf("Not Jumping\n");
+	}
+
 
 }

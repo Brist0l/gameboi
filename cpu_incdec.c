@@ -342,6 +342,23 @@ void opcd_dec_at_hl(){
 	dprintf("Value at register HL is after: 0x%02x\n",memory_read(getHL()));
 }
 
+void opcd_inc_at_hl(){
+	// INC (HL)
+	// Inc the value at HL by 1
+
+	dprintf("INC (HL)\n");
+
+	dprintf("Value of register HL is: 0x%04x\n",getHL());
+	dprintf("Value at register HL is before: 0x%02x\n",memory_read(getHL()));
+
+	HL = getHL();
+	result = memory_read(HL) + 1;
+	setDECflags(memory_read(HL),result);
+	memory_write(getHL(),result);
+
+	dprintf("Value at register HL is after: 0x%02x\n",memory_read(getHL()));
+}
+
 void opcd_dec_a(){
 	// DEC A
 	// lenght is 1 byte

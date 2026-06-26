@@ -6,8 +6,8 @@
 #include"rom.h"
 #include"debug.h"
 
-bool debug_flag = false;
-bool boot_rom_enable = true;
+bool debug_flag = true;
+bool boot_rom_enable = false;
 bool gb_doc = true;
 
 int main(){
@@ -20,11 +20,11 @@ int main(){
 	cpu.SP = 0xfffe; // Reference: GB CPU manual (3.2.4 , pg 64)
 
 	int size = getsize("dmg_boot.bin");
-	int size1 = getsize("gb-test-roms/cpu_instrs/individual/09-op\ r,r.gb");
+	int size1 = getsize("gb-test-roms/cpu_instrs/individual/11-op\ a,\(hl\).gb");
 
 	//dprintf("dmg_boot ROM size: %d\n",size);
 
-	load_rom("gb-test-roms/cpu_instrs/individual/09-op\ r,r.gb",size1,0x0);
+	load_rom("gb-test-roms/cpu_instrs/individual/11-op\ a,\(hl\).gb",size1,0x0);
 	if(boot_rom_enable == true)
 		load_rom("dmg_boot.bin",size,0x0);
 	//load_rom("gb-test-roms/cpu_instrs/cpu_instrs.gb",size1,0x100);

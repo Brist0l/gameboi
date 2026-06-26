@@ -21,6 +21,7 @@ void opcd_dec_h();
 void opcd_inc_l();
 void opcd_dec_l();
 void opcd_dec_at_hl();
+void opcd_inc_at_hl();
 void opcd_dec_a();
 void opcd_dec_sp();
 void opcd_inc_sp();

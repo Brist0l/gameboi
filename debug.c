@@ -135,7 +135,7 @@ void other_log(){
 }
 
 void serial_io(char s){
-	FILE* f = fopen("logs/serial/serialio9","a");
+	FILE* f = fopen("logs/serial/serialio11","a");
 	fputc(s,f);
 	fclose(f);
 }
