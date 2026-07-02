@@ -12,6 +12,7 @@ void opcd_swap_hl();
 void opcd_srl_b();
 void opcd_srl_c();
 void opcd_srl_d();
+void opcd_srl_hl();
 void opcd_srl_e();
 void opcd_srl_h();
 void opcd_srl_l();

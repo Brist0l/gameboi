@@ -353,7 +353,7 @@ void opcd_inc_at_hl(){
 
 	HL = getHL();
 	result = memory_read(HL) + 1;
-	setDECflags(memory_read(HL),result);
+	setINCflags(memory_read(HL),result);
 	memory_write(getHL(),result);
 
 	dprintf("Value at register HL is after: 0x%02x\n",memory_read(getHL()));

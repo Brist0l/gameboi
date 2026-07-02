@@ -44,7 +44,7 @@ extern unsigned short lsb;
 extern unsigned short u16;
 extern uint8_t u8;
 extern int8_t  s8;
-extern unsigned short seventh_bit;
+extern unsigned short bit;
 extern uint8_t addr;
 extern int8_t signed_offset;
 extern unsigned short buffer;

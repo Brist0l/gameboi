@@ -207,3 +207,13 @@ void setCPflags(uint8_t a, uint8_t b){
 	seth((a & 0xF) < (b & 0xF));
 	setc(a < b);
 }
+
+void setBITflags(unsigned short bit){
+	if(bit == 0)
+		setz(1);
+	else 
+		setz(0);
+
+	setn(0);
+	seth(1);
+}

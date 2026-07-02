@@ -11,4 +11,6 @@ like with cpu_ld
 => fix the RR n implemenations
 ---DONE---
 => Make the serial I/O write to a file
-=> Take in runtime arguments
+=> Take in runtime arguments (need to do)
+--NEW--
+=> correct the BIT instructions and ig test them before doing 11 , also check the log of 11

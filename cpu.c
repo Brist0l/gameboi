@@ -50,7 +50,7 @@ unsigned short lsb;
 unsigned short u16;
 uint8_t u8;
 int8_t  s8;
-unsigned short seventh_bit;
+unsigned short bit;
 uint8_t addr;
 int8_t signed_offset;
 unsigned short buffer;
@@ -173,6 +173,12 @@ void execute(){
 			// add BC to HL and store it again in HL
 
 			opcd_add_hl_bc();
+			break;
+
+		case 0x0a:
+			// LD A, (BC)
+
+			opcd_ld_a_bc();
 			break;
 
 		case 0x0b:
@@ -510,6 +516,14 @@ void execute(){
 			// ADD HL, SP
 
 			opcd_add_hl_sp();
+			break;
+
+		case 0x3a:
+			// LOAD A,(HL-)
+			// lenght is 1 byte
+			// put data at HL into  A and decrement HL
+
+			opcd_ld_a_hlmin();
 			break;
 
 		case 0x3b:
@@ -1582,7 +1596,7 @@ void execute(){
 
 			opcd_sub_u8();
 			break;
-		
+
 		case 0xd7:
 			// RST 2
 
@@ -1793,7 +1807,7 @@ void execute(){
 
 			opcd_or_u8();
 			break;
-		
+
 		case 0xf7:
 			// RST 6
 
@@ -1820,7 +1834,6 @@ void execute(){
 			// into register A
 
 			opcd_ld_a_u16();
-
 			break;
 
 		case 0xfb:
@@ -1889,8 +1902,10 @@ void execute(){
 	if(gb_doc == true)
 		gb_doc_log();
 
-	//if(instr_cnt == 730268)
+	if(instr_cnt == 2886764){
+		_memorydump(0xdef0,0xdef6);
 		//exit(1);
+	}
 
 	dprintf("\nRegister PC after: 0x%04x\n",cpu.PC);
 

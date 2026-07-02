@@ -155,6 +155,21 @@ void opcd_ld_a_de(){
 	dprintf("Value of Register A after is: 0x%02x\n",cpu.A);
 }
 
+void opcd_ld_a_bc(){
+	// LOAD A,(BC)
+	// lenght is 1 byte
+	// put contents at addr specified by BC into A
+
+	dprintf("LD A, (BC)\n");
+	dprintf("Value of Register BC is: 0x%04x\n",getBC());
+	dprintf("Value of Register A before is: 0x%02x\n",cpu.A);
+	dprintf("Value at 0x%04x is: 0x%02x\n",getBC(),memory_read(getBC()));
+
+	cpu.A = memory_read(getBC());
+
+	dprintf("Value of Register A after is: 0x%02x\n",cpu.A);
+}
+
 void opcd_ld_a_hl(){
 	// LOAD A, (HL)
 	// lenght is 1 byte
@@ -304,6 +319,31 @@ void opcd_ld_a_hlplus(){
 
 	cpu.A = memory_read(HL);
 	HL++;
+	setHL(HL);
+
+	dprintf("HL Register after: 0x%04x\n",getHL());
+	dprintf("H Register after: 0x%02x\n",cpu.H);
+	dprintf("L Register after: 0x%02x\n",cpu.L);
+	dprintf("Value of Register A after: 0x%02x\n",cpu.A);
+
+}
+
+void opcd_ld_a_hlmin(){
+	// LOAD A,(HL-)
+	// lenght is 1 byte
+
+	dprintf("LD A, (HL-)\n");
+
+	dprintf("HL Register before: 0x%04x\n",getHL());
+	dprintf("H Register before: 0x%02x\n",cpu.H);
+	dprintf("L Register before: 0x%02x\n",cpu.L);
+	dprintf("Value of Register A before: 0x%02x\n",cpu.A);
+	dprintf("memory at HL before: 0x%02x\n",memory[getHL()]);
+
+	HL = getHL();
+
+	cpu.A = memory_read(HL);
+	HL--;
 	setHL(HL);
 
 	dprintf("HL Register after: 0x%04x\n",getHL());
@@ -1198,7 +1238,6 @@ void opcd_ld_hl_sp_u8(){
 	HL = getHL();
 	HL = cpu.SP + s8;
 
-
 	seth(((cpu.SP & 0x0F) + (s8 & 0x0F)) > 0x0F);
 	setc(((cpu.SP & 0xFF) + (s8 & 0xFF)) > 0xFF);
 	setz(0);
@@ -1446,12 +1485,14 @@ void opcd_ld_a_u16(){
 	// into register A
 
 	dprintf("LD A, (u16)\n");
+
 	u16 = get_u16();
 
 	dprintf("Register Value A before : 0x%02x\n",
 			cpu.A);
 	dprintf("Value at Address 0x%04x is : 0x%02x\n",
 			u16,memory_read(u16));
+
 	dprintf("LD A, (0x%04x)\n",u16);
 
 	cpu.A = memory_read(u16);

@@ -8,17 +8,17 @@
 
 void logmsg(const char* function_name,bool start){
 	if(debug_flag){
-	if(start){
-		dprintf(ANSI_COLOR_RED);
-		dprintf("\n=====function %s START=====\n",function_name);
-		dprintf(ANSI_COLOR_RESET);
+		if(start){
+			dprintf(ANSI_COLOR_RED);
+			dprintf("\n=====function %s START=====\n",function_name);
+			dprintf(ANSI_COLOR_RESET);
+		}
+		else{
+			dprintf(ANSI_COLOR_RED);
+			printf("=====function %s END=====\n",function_name);
+			dprintf(ANSI_COLOR_RESET);
+		}
 	}
-	else{
-		dprintf(ANSI_COLOR_RED);
-		printf("=====function %s END=====\n",function_name);
-		dprintf(ANSI_COLOR_RESET);
-	}
-}
 }
 
 // View the memory locations from a starting address to an ending address
@@ -135,7 +135,7 @@ void other_log(){
 }
 
 void serial_io(char s){
-	FILE* f = fopen("logs/serial/serialio11","a");
+	FILE* f = fopen("logs/serial/serialio10","a");
 	fputc(s,f);
 	fclose(f);
 }

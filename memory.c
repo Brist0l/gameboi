@@ -1,6 +1,7 @@
 #include<stdint.h>
 #include<stdio.h>
 #include<unistd.h>
+#include<stdlib.h>
 
 #include "cpu.h"
 #include "debug.h"
@@ -84,6 +85,22 @@ void memory_write(uint16_t mem_addr,uint8_t val){
 			//sleep(2);
 		//}
 		serial_io(serial_data);
+	}
+
+	if(mem_addr == 0xdef6 && val == 0x0f){
+	    //printf("READ %04x\n",mem_addr);
+            //memory[0xdef6] = 0x87; //  Just to pass the infinite loop
+	    //exit(1);
+	    _memorydump(0xdef0,0xdef6);
+	    dprintf("===========================================+++++++++++++++++++++++++++++++++++================================\n");
+	}
+
+	if(mem_addr == 0xc704 && val == 0x0f){
+	    //printf("READ %04x\n",mem_addr);
+            //memory[0xdef6] = 0x87; //  Just to pass the infinite loop
+	    _memorydump(0x4700,0x470f);
+	    dprintf("===========================================+++++++++++++++++++++++++++++++++++================================\n");
+	    //exit(1);
 	}
 
 	//if(mem_addr >= 0x9900 && mem_addr <= 0x9940)

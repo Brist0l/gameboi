@@ -263,6 +263,29 @@ void opcd_srl_d(){
 
 }
 
+void opcd_srl_hl(){
+	// SRL (HL)
+	// lenght is 2 bytes
+
+	dprintf("SRL (HL)\n");
+
+	u8 = getHL();
+	dprintf("value of register D before is : 0b%08b\n",u8);
+
+	setc(u8 & 0x01); //set the carry flag to the lsb
+
+	u8 >>= 1; // Shift by 1 bit
+	u8 = u8 & 0b01111111; // set the MSD to 0
+
+	setz(u8 == 0);
+	setn(0);
+	seth(0);
+	
+	memory_write(getHL(),u8);
+
+	dprintf("value of register D after is : 0b%08b\n",u8);
+}
+
 void opcd_srl_e(){
 	// SRL E
 	// lenght is 2 bytes
