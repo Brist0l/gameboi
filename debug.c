@@ -48,6 +48,21 @@ void _memorydump(int start,int end){
 	logmsg("_memorydump",false);
 }
 
+void _stackdump(){
+	logmsg("_stackdump",true);
+
+	if(debug_flag){
+		for(int i = 0xdf63; i <= 0xdff0 ;i++){
+			if(i % 16 == 0)
+				printf("\n%04x => ",i);
+			printf("%02x ",memory[i]);
+		}
+		printf("\n");
+	}
+
+	logmsg("_stackdump",false);
+}
+
 void registerdump(){
 	logmsg("registerdump",true);
 
@@ -135,7 +150,7 @@ void other_log(){
 }
 
 void serial_io(char s){
-	FILE* f = fopen("logs/serial/serialio11","a");
+	FILE* f = fopen("logs/serial/serialio8","a");
 	fputc(s,f);
 	fclose(f);
 }

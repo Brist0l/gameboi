@@ -16,3 +16,5 @@ like with cpu_ld
 => correct the BIT instructions and ig test them before doing 11 , also check the log of 11
 --DONE--
 => Test 11th blargg's test
+--DONE--
+=> make a function showstack()

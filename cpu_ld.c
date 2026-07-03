@@ -1397,11 +1397,11 @@ void opcd_ld_u16_a(){
 	dprintf("LD 0x%04x, A\n",u16);
 
 	dprintf("Storing 0x%02x at 0x%04x\n",cpu.A,u16);
-	dprintf("Value at 0x%04x before: 0x%02x\n",u16,memory[u16]);
+	dprintf("Value at 0x%04x before: 0x%02x\n",u16,memory_read(u16));
 
 	memory_write(u16, cpu.A);
 
-	dprintf("Value at 0x%04x after: 0x%02x\n",u16,memory[u16]);
+	dprintf("Value at 0x%04x after: 0x%02x\n",u16,memory_read(u16));
 }
 
 void opcd_ld_u16_sp(){
@@ -1416,12 +1416,13 @@ void opcd_ld_u16_sp(){
 	u16 = get_u16();
 
 	dprintf("LD 0x%04x, SP\n",u16);
+	dprintf("Value of register SP: 0x%04x\n",cpu.SP);
 
 	lsb = cpu.SP  & 0x00ff; 	  // P
 	msb = (cpu.SP & 0xff00) >> 8; // S
 
 	dprintf("Storing 0x%02x at 0x%04x\n",lsb,u16);
-	dprintf("Storing 0x%02x at 0x%04x\n",lsb,u16 + 1);
+	dprintf("Storing 0x%02x at 0x%04x\n",msb,u16 + 1);
 	dprintf("Value at 0x%04x before: 0x%02x\n",u16,memory_read(u16));
 	dprintf("Value at 0x%04x before: 0x%02x\n",u16 + 1,memory_read(u16 +1));
 

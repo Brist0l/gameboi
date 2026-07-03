@@ -1765,19 +1765,8 @@ void execute(){
 			// POP AF
 			// lenght is 1 byte
 
-			dprintf("POP AF\n");
-			dprintf("SP before: 0x%04x\n",cpu.SP);
-
-			lsb = pop(); // C
-			msb = pop();  // B
-
-			u16 = (msb << 8) | lsb;
-
-			setAF(u16);
-
-			dprintf("Value of register AF : 0x%04x\n",getAF());
-			dprintf("SP after: 0x%04x\n",cpu.SP);
-
+			opcd_pop_af();
+			
 			break;
 
 		case 0xf2:
@@ -1908,7 +1897,8 @@ void execute(){
 	if(gb_doc == true)
 		gb_doc_log();
 
-	if(instr_cnt == 4020142){
+	if(instr_cnt == 208109){
+		_stackdump();
 		//exit(1);
 	}
 

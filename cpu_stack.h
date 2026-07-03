@@ -1,6 +1,7 @@
 #ifndef CPU_STACK_H
 #define CPU_STACK_H
 
+void opcd_pop_af();
 void opcd_pop_bc();
 void opcd_push_bc();
 void opcd_push_af();

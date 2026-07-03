@@ -224,6 +224,7 @@ void opcd_ret_nz(){
 
 }
 
+
 void opcd_ret_c(){
 	// RET C
 	// lenght is 1 byte

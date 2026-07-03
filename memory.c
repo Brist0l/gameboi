@@ -95,6 +95,13 @@ void memory_write(uint16_t mem_addr,uint8_t val){
 	    dprintf("===========================================+++++++++++++++++++++++++++++++++++================================\n");
 	}
 
+	if(mem_addr == 0xdf7e && val == 0x9b){
+	    //printf("READ %04x\n",mem_addr);
+            //memory[0xdef6] = 0x87; //  Just to pass the infinite loop
+	    //exit(1);
+	    dprintf("find_this\n");
+	}
+
 	if(mem_addr == 0xc704 && val == 0x0f){
 	    //printf("READ %04x\n",mem_addr);
             //memory[0xdef6] = 0x87; //  Just to pass the infinite loop

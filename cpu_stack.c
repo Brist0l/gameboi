@@ -3,6 +3,24 @@
 #include "memory.h"
 #include "debug.h"
 
+void opcd_pop_af(){
+	// POP AF
+
+	dprintf("POP AF\n");
+	dprintf("SP before: 0x%04x\n",cpu.SP);
+
+	lsb = pop(); // F
+	msb = pop();  // A
+	
+	lsb = 0xf0 & lsb;
+	u16 = (msb << 8) | lsb;
+
+	setAF(u16);
+
+	dprintf("Value of register AF : 0x%04x\n",getAF());
+	dprintf("SP after: 0x%04x\n",cpu.SP);
+}
+
 void opcd_pop_bc(){
 	// POP BC
 	// lenght is 1 byte
