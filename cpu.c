@@ -385,6 +385,12 @@ void execute(){
 			opcd_ld_h_u8();
 			break;
 
+		case 0x27:
+			//DAA
+
+			opcd_daa();
+			break;
+
 		case 0x28:
 			// JR Z, u8
 			// JUMP relative if Zero flag is 1 to (current addr + n)
@@ -1902,8 +1908,7 @@ void execute(){
 	if(gb_doc == true)
 		gb_doc_log();
 
-	if(instr_cnt == 2886764){
-		_memorydump(0xdef0,0xdef6);
+	if(instr_cnt == 4020142){
 		//exit(1);
 	}
 

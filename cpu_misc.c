@@ -2,6 +2,31 @@
 #include "cpu.h"
 #include "flags.h"
 
+void opcd_daa(){
+ 	// DAA
+	// bruh wot
+    int correction = 0;
+    if (geth() || (!getn() && (cpu.A & 0x0F) > 0x09)) {
+        correction |= 0x06;
+    }
+    if (getC() || (!getn() && (cpu.A & 0xFF) > 0x99)) {
+        correction |= 0x60;
+        setc(true);
+    }
+    bool carry = false;
+    int right = correction;
+    if (getn()) {
+        carry = true;
+        right = (~right) & 0xFF;
+    }
+    int result = (cpu.A + right + (carry ? 1 : 0));
+    cpu.A = (result);
+    seth(false);
+    setz((result & 0xFF) == 0);
+	
+	dprintf("ok");
+}
+
 void opcd_cpl(){
 	// Take compliment of register A
 

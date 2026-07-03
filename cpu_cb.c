@@ -521,7 +521,7 @@ void execute_cb(unsigned int nxtbyt,long long instr_cnt){
 				case 0x4e:
 					// BIT 1 , (HL)
 
-					opcd_bit_1_b();
+					opcd_bit_1_hl();
 					break;
 
 				case 0x4f:

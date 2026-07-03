@@ -178,14 +178,17 @@ void opcd_swap_hl(){
 	// H = 0
 	// C = 0
 		
-	dprintf("SWAP B\n");
-	dprintf("value of register B before is : 0b%08b\n", cpu.B);
+	dprintf("SWAP HL\n");
 
-	cpu.B = (cpu.B >> 4) | (cpu.B << 4);
+	u8 = memory_read(getHL());
+	dprintf("value of register B before is : 0b%08b\n", u8);
+	
+	u8 = (u8 >> 4) | (u8 << 4);
+	
+	memory_write(getHL(),u8);
+	setSWAPflags(u8);
 
-	setSWAPflags(cpu.B);
-
-	dprintf("value of register B after is  : 0b%08b\n", cpu.B);
+	dprintf("value of register B after is  : 0b%08b\n", u8);
 }
 
 void opcd_srl_b(){
@@ -269,21 +272,22 @@ void opcd_srl_hl(){
 
 	dprintf("SRL (HL)\n");
 
-	u8 = getHL();
-	dprintf("value of register D before is : 0b%08b\n",u8);
+	u8 = memory_read(getHL());
+
+	dprintf("value of u8 before is : 0b%08b\n",u8);
 
 	setc(u8 & 0x01); //set the carry flag to the lsb
 
 	u8 >>= 1; // Shift by 1 bit
 	u8 = u8 & 0b01111111; // set the MSD to 0
+	
+	memory_write(getHL(),u8);
 
 	setz(u8 == 0);
 	setn(0);
 	seth(0);
 	
-	memory_write(getHL(),u8);
-
-	dprintf("value of register D after is : 0b%08b\n",u8);
+	dprintf("value of u8 after is : 0b%08b\n",u8);
 }
 
 void opcd_srl_e(){
@@ -550,6 +554,7 @@ void opcd_sla_hl(){
 	
 	u8 <<= 1; //shift left by 1
 	u8 = u8 & 0b11111110; // set b0 to 0
+	memory_write(getHL(),u8);
 	
 	setz(u8 == 0);
 	setn(0);
@@ -792,6 +797,7 @@ void opcd_sra_hl(){
 
 	u8 >>= 1; //shift right by 1
 	u8 = u8 | buffer; // set b0 to 0
+	memory_write(getHL(),u8);
 	
 	setz(u8 == 0);
 	setn(0);

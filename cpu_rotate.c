@@ -545,6 +545,7 @@ void opcd_rrc_hl(){
 	u8 >>= 1;
 	lsb <<= 7;
 	u8 = lsb | u8 ;
+	memory_write(getHL(),u8);
 
 	setz(u8 == 0);
 	setn(0);
@@ -977,6 +978,7 @@ void opcd_rl_hl(){
 
 		u8 <<= 1;
 		u8 = lsb | u8 ;
+		memory_write(getHL(),u8);
 
 		setz(u8 == 0);
 		setn(0);
@@ -1199,6 +1201,7 @@ void opcd_rr_hl(){
 		dprintf("buffer after shifting 0b%08b\n",buffer);
 
 		u8 = u8 | buffer; // set the MSB to 0
+		memory_write(getHL(),u8);
 
 		setz(u8 == 0);
 		setn(0);

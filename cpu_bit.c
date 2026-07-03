@@ -240,6 +240,7 @@ void opcd_bit_1_hl(){
 		// BIT 1,(HL)
 
 		dprintf("BIT 1,(HL)\n");
+
 		u8 = memory_read(getHL());
 
 		dprintf("value at HL is : 0b%b\n",u8);
