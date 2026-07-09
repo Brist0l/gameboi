@@ -2,7 +2,7 @@
 #include "flags.h"
 #include "cpu.h"
 #include "memory.h"
-#include "registers.h"
+#include "registers_cpu.h"
 
 
 void opcd_rla(){

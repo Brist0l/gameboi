@@ -2,7 +2,7 @@
 #include "cpu.h"
 #include "flags.h"
 #include "memory.h"
-#include "registers.h"
+#include "registers_cpu.h"
 
 // ├── cpu_jump.c         // JP, JR, CALL, RET, RST
 

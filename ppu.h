@@ -13,13 +13,12 @@ struct Game{
 	bool keypad[16];
 };
 
-bool game_init_sdl(struct Game *g);
 bool game_load_media(struct Game *g);
 bool game_new(struct Game **game);
 void game_free(struct Game **game);
 void game_events(struct Game *g,int* key);
 void game_draw(struct Game *g);
-bool draw(struct Game *g,int x,int y,int N,int data);
+bool draw(struct Game *g);
 void render_screen(struct Game *g);
 bool clear_screen(struct Game *g);
 

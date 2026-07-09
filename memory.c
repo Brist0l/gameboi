@@ -1,7 +1,5 @@
 #include<stdint.h>
-#include<stdio.h>
 #include<unistd.h>
-#include<stdlib.h>
 
 #include "cpu.h"
 #include "debug.h"

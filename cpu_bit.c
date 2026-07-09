@@ -2,7 +2,7 @@
 #include "cpu.h"
 #include "flags.h"
 #include "memory.h"
-#include "registers.h"
+#include "registers_cpu.h"
 
 #define GET0BIT 0b00000001
 #define GET1BIT 0b00000010

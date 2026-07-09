@@ -1,6 +1,6 @@
 #include "cpu_rotate.h"
 #include "cpu_shift.h"
-#include "registers.h"
+#include "registers_cpu.h"
 #include "cpu_bit.h"
 
 #include <stdio.h>

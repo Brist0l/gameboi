@@ -1,5 +1,5 @@
 #include "cpu.h"
-#include "registers.h"
+#include "registers_cpu.h"
 #include "memory.h"
 #include "debug.h"
 

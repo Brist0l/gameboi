@@ -5,10 +5,18 @@
 #include"memory.h"
 #include"rom.h"
 #include"debug.h"
+#include"ppu.h"
 
-bool debug_flag = false;
+bool debug_flag = true;
 bool boot_rom_enable = false;
 bool gb_doc = true;
+
+struct Game* g = NULL;
+
+int key;
+
+void game_run(struct Game *g ,float speed){
+}
 
 int main(){
 	if(gb_doc != true)
@@ -20,11 +28,11 @@ int main(){
 	cpu.SP = 0xfffe; // Reference: GB CPU manual (3.2.4 , pg 64)
 
 	int size = getsize("dmg_boot.bin");
-	int size1 = getsize("gb-test-roms/cpu_instrs/individual/08-misc\ instrs.gb");
+	int size1 = getsize("gb-test-roms/cpu_instrs/individual/02-interrupts.gb");
 
 	//dprintf("dmg_boot ROM size: %d\n",size);
 
-	load_rom("gb-test-roms/cpu_instrs/individual/08-misc\ instrs.gb",size1,0x0);
+	load_rom("gb-test-roms/cpu_instrs/individual/02-interrupts.gb",size1,0x0);
 
 	if(boot_rom_enable == true)
 		load_rom("dmg_boot.bin",size,0x0);
@@ -41,15 +49,34 @@ int main(){
 	_memorydump(0x0000,0x01ff);
 	//while(1){
 	//while(cpu.PC != 0x100){
-	while(cnt-- != 0){
-		//if(cnt % 1000 == 0)
-		 	//printf("0x%04x\n", cpu.PC);
-		execute();
+
+	if(game_new(&g)){
+
+		//Uint32 last = SDL_GetTicks();
+		dprintf("Game: %p\n",g);
+
+		while(g->is_running){
+			game_events(g,&key);
+			//dprintf("Running Game, 0x%x is pressed\n",);
+
+		//	clear_screen(g);
+			execute();
+
+			//Uint32 now = SDL_GetTicks();
+			//if((now - last) >= 1000/60){
+				//timers
+			//}
+
+			SDL_Delay(1000); // i.e. 60Hz
+			render_screen(g);
+			}
 	}
+
+	game_free(&g);
 
 	registerdump();
 
-	_memorydump(0x0630,0x0700);
-	_memorydump(0x8000,0x9fff);
-	_memorydump(0xff00,0xffff);
+	//_memorydump(0x0630,0x0700);
+	//_memorydump(0x8000,0x9fff);
+	//_memorydump(0xff00,0xffff);
 }

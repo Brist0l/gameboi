@@ -1,7 +1,7 @@
 #include "cpu.h"
 #include "flags.h"
 #include "debug.h"
-#include "registers.h"
+#include "registers_cpu.h"
 #include "memory.h"
 
 void opcd_add_hl_hl(){

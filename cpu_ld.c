@@ -1,7 +1,7 @@
 #include "debug.h"
 #include "cpu.h"
 #include "flags.h"
-#include "registers.h"
+#include "registers_cpu.h"
 #include "memory.h"
 
 // 	├── cpu_ld.c           // LD instructions

@@ -13,7 +13,7 @@
 #include "cpu_shift.h"
 #include "cpu_misc.h"
 #include "cpu_cb.h"
-#include "registers.h"
+#include "registers_cpu.h"
 #include "flags.h"
 
 #include "memory.h"
@@ -1766,7 +1766,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_pop_af();
-			
+
 			break;
 
 		case 0xf2:

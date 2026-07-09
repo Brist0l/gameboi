@@ -61,3 +61,5 @@ void setAF(uint16_t value){
 	cpu.A = msb;
 	cpu.F = lsb;
 }
+ 
+
