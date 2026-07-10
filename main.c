@@ -15,9 +15,6 @@ struct Game* g = NULL;
 
 int key;
 
-void game_run(struct Game *g ,float speed){
-}
-
 int main(){
 	if(gb_doc != true)
 		printf("STARTING\n");
@@ -67,9 +64,9 @@ int main(){
 				//timers
 			//}
 
-			SDL_Delay(1000); // i.e. 60Hz
 			render_screen(g);
-			}
+			SDL_Delay(1000); // i.e. 60Hz
+		}
 	}
 
 	game_free(&g);

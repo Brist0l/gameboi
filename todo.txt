@@ -17,4 +17,16 @@ like with cpu_ld
 --DONE--
 => Test 11th blargg's test
 --DONE--
-=> make a function showstack()
+=> make a function showstack() (need to do)
+--NEW--
+=> write the docs of draw
+=> implement colour in rendering
+
+
+
+
+
+
+=====NEED TO DO========
+=> Take in runtime arguments (need to do)
+=> make a function showstack() (need to do)
