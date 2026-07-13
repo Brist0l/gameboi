@@ -37,7 +37,12 @@ uint8_t display[WINDOW_HEIGHT][WINDOW_WIDTH] = {0};
  *    		WX (0xFF4B) => This just gives x-pos of where the window
  *    			       should be placed on the background.
  *    			       The value should be calculated as WX - 7.
- * 3) Sprites:
+ *
+ * 3) Sprites: They are just 8x8 (or 8x16) pixel tiles. They aren't limited
+ *    by the Window or the Background grid. They are movable objects.
+ *
+ *    This sprite data is stored in the OAM (Object Attribute Memory) which
+ *    can fit 40 sprites.
  *
  *
  * =======Tile:=====================================
@@ -53,13 +58,43 @@ uint8_t display[WINDOW_HEIGHT][WINDOW_WIDTH] = {0};
  * So this tile data will be stored in the VRAM (Video RAM , basically it's like
  * a RAM but for pixels and stuff). The tile data is stored in,
  *
- * 			0x8000 to 0x97ff
+ * 			0x8000 to 0x97ff  --------> Storage region of Graphic data
  *
  * That's about 6kb worth of data for tiles.
  * So there are 8x8 squares which are being used, that means 64 pixels, but the gameboy
  * is a 2 bpp , so that means 64 * 2 bits , that means 128 bit worth of memory will be
  * used to store 1 tile. Converting it to bytes ,  we get 128/8 bytes , or 16 bytes.
  * That means we can store 6kb/16 tiles in the VRAM at once, which is 384 tiles.
+ *
+ * =======Background Maps:===========================
+ *
+ * In order to set which tiles should be displayed in the background/window grid, we
+ * use background maps. The VRAM from,
+ *
+ * 			0x9800 to 0x9bff -------> 1st background map
+ * 			       and
+ * 			0x9c00 to 0x9fff -------> 2nd background map
+ *
+ * A background map consists of 32x32 bytes representing tile numbers organized row by
+ * row. This means that the first byte in a background map is the Tile Number of the
+ * Tile at the very top left. The byte after is the Tile Number of the Tile to the
+ * right of it and so on. The 33rd byte would represent the Tile Number of the
+ * leftmost tile in the second tile row.
+ *
+ * =======OAM:=====================================
+ *
+ * This is the Object Attribtute Memory which stores the attributes of the objects
+ * at the region,
+ * 			0xfe00 to 0xfe9f --------> OAM region
+ *
+ * That's 160 bytes and to set the attribtutes we have 4 bytes for each sprite , hence
+ * we can only store 40 sprites.
+ *
+ * Byte 0: Y-postion , it's the object's vertical postion on the screen + 16.
+ * Byte 1: X-postion , it's the object's horizontal postion on the screen + 8.
+ * Byte 2: Tile index (NEED TO READ) (TODO)
+ * Byte 3: Attributes flag (NEED TO REFER) (TODO)
+ *
  *
  */
 
@@ -91,10 +126,14 @@ bool draw(struct Game *g){
 	// 0x00 => 0 0 0 0 0 0 0 0 -> Most significant byte  of colour
 
 	uint8_t test_data[] = {
-    0xFF, 0x00, 0x7E, 0xFF,
-    0x85, 0x81, 0x89, 0x83,
-    0x93, 0x85, 0xA5, 0x8B,
-    0xC9, 0x97, 0x7E, 0xFF
+    0x3C, 0x7E,
+    0x42, 0x42,
+    0x42, 0x42,
+    0x42, 0x42,
+    0x7E, 0x5E,
+    0x7E, 0x0A,
+    0x7C, 0x56,
+    0x38, 0x7C
 };
 	uint8_t tile[8][8] = {0};
 	int t_x = 0; // Goes Right
@@ -153,7 +192,7 @@ void render_screen(struct Game *g){
 
 			SDL_SetRenderDrawColor(g->renderer,c.r,c.g,c.b,c.a);
 
-                	SDL_FRect rect = {x * SCALE * 2, y * SCALE * 2, SCALE * 2, SCALE * 2};
+                	SDL_FRect rect = {x * SCALE * 4, y * SCALE * 4, SCALE * 4, SCALE * 4};
                 	SDL_RenderFillRect(g->renderer, &rect);
         	}
     	}

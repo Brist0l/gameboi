@@ -1,8 +1,8 @@
 #include<stdint.h>
 
 #include "memory.h"
+#include "debug.h"
 
-uint8_t getLCDC(){
 /* PPU Control Register:
  *
  * LCDC is the LCD Control register , Its bits toggle what elements are
@@ -26,8 +26,63 @@ uint8_t getLCDC(){
  *	BG and window enable       => 0th bit
  *	---------------------------
  *
+ *	7) LCD enable/disable: This controls whether the PPU is on/off
+ *			
+ *			0 -> Screen Off
+ *			1 -> PPU operational 
+ *
+ *	6) Window and tile map: The window will use background from map
+ *				located at, if the bit is
+ *			
+ *			0 -> map located at 0x9800 to 0x9BFF
+ *			1 -> map located at 0x9C00 to 0x9FFF
+ *
+ *	5) Window display enable: Depending on bit the window will be 
+ *				  hidden or visible
+ *			
+ *			0 -> Hide the window
+ *			1 -> The window is visible
+ *
+ *	4) Tile data select: Depending on bit the tile fetching method
+ *			     is decided.
+ *			
+ *			0 -> 8800 method is used
+ *			1 -> 8000 method is used
+ *
+ *	3) BG Tile map select: Depending on the bit the background map
+ *			       address will be selected and the 
+ *			       background will use that only. (in 6th bit
+ *			       the window will use that)
+ *
+ *			0 -> use BG map at 0x9800 to 0x9BFF
+ *			1 -> use BG map at 0x9C00 to 0x9FFF
+ *
+ *	2) Sprite size: The bit decides the size of the sprite.
+ *			
+ *			0 -> use 1x1 Tile
+ *			1 -> use 1x2 Tile
+ *
+ *	1) Sprite enable: This bit renders or hides the sprites.
+ *			
+ *			0 -> Hide the sprites
+ *			1 -> Render the sprites
+ *
+ *	0) BG/Window enable: This enables/disables the bg and window.
+ *			     The sprites are unaffected.
+ *
+ *			0 -> Neither the Window nor the BG tiles are drawn
+ *			1 -> the Window and the BG tiles are drawn
+ *
  */
-	return memory_read(0xff40);
+
+uint8_t getLCDC_lcd_ppu_enable_bit(){
+	dprintf("LCDC Regiser : 0b%08b\n",memory_read(0xff40));
+	return (((memory_read(0xff40)) & 0b10000000) >> 7 );
+}
+
+uint8_t getLCDC_lcd_window_tile_map_select(){
+	dprintf("LCDC Regiser : 0b%08b\n",memory_read(0xff40));
+	return (((memory_read(0xff40)) & 0b10000000) >> 7 );
 }
 
 uint8_t getLY(){

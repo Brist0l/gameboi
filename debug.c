@@ -50,17 +50,27 @@ void _memorydump(int start,int end){
 
 void _stackdump(){
 	logmsg("_stackdump",true);
+	
+	_memorydump(0xdf63,0xdff0);
 
-	if(debug_flag){
-		for(int i = 0xdf63; i <= 0xdff0 ;i++){
-			if(i % 16 == 0)
-				printf("\n%04x => ",i);
-			printf("%02x ",memory[i]);
-		}
-		printf("\n");
-	}
+	//if(debug_flag){
+		//for(int i = 0xdf63; i <= 0xdff0 ;i++){
+			//if(i % 16 == 0)
+				//printf("\n%04x => ",i);
+			//printf("%02x ",memory[i]);
+		//}
+		//printf("\n");
+	//}
 
 	logmsg("_stackdump",false);
+}
+
+void _vramdump(){
+	logmsg("_vramdump",true);
+
+	_memorydump(0x8000,0x97ff);
+
+	logmsg("_vramdump",false);
 }
 
 void registerdump(){
@@ -154,3 +164,4 @@ void serial_io(char s){
 	fputc(s,f);
 	fclose(f);
 }
+

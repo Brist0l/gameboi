@@ -24,6 +24,7 @@ void logmsg(const char* function_name,bool start);
 void _memoryframe(short start,short end);
 void _memorydump(int start,int end);
 void _stackdump();
+void _vramdump();
 void _fillopcode();
 void registerdump();
 void _fillregisters();

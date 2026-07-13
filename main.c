@@ -15,7 +15,12 @@ struct Game* g = NULL;
 
 int key;
 
-int main(){
+int main(int argc,char* argv[]){
+	if(argc < 2){
+		printf("Enter the ROM file bruv\n");
+		return -1;
+	}
+
 	if(gb_doc != true)
 		printf("STARTING\n");
 
@@ -25,11 +30,11 @@ int main(){
 	cpu.SP = 0xfffe; // Reference: GB CPU manual (3.2.4 , pg 64)
 
 	int size = getsize("dmg_boot.bin");
-	int size1 = getsize("gb-test-roms/cpu_instrs/individual/02-interrupts.gb");
+	int size1 = getsize(argv[1]);
 
 	//dprintf("dmg_boot ROM size: %d\n",size);
 
-	load_rom("gb-test-roms/cpu_instrs/individual/02-interrupts.gb",size1,0x0);
+	load_rom(argv[1],size1,0x0);
 
 	if(boot_rom_enable == true)
 		load_rom("dmg_boot.bin",size,0x0);
