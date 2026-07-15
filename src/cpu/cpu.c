@@ -940,6 +940,11 @@ void execute(){
 			opcd_ld_hl_l();
 			break;
 
+		case 0x76:
+			// TODO
+
+			break;
+
 		case 0x77:
 			// LOAD (HL),A
 			// lenght is 1 byte

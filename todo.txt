@@ -28,5 +28,5 @@ like with cpu_ld
 
 
 =====NEED TO DO========
-=> Take in runtime arguments (need to do)
-=> make a function showstack() (need to do)
+=> Take in runtime arguments (need to do) (done) 
+=> make a function showstack() (need to do) 
