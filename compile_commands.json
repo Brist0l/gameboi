@@ -1,0 +1,46 @@
+[
+  {
+    "file": "src/main.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-o",
+      "build/obj/src/main.o",
+      "src/main.c",
+      "-c",
+      "-Wall",
+      "-Wextra",
+      "-Wswitch",
+      "-O3",
+      "-Iinclude",
+      "-g",
+      "-MMD",
+      "-MP",
+      "-MF",
+      "build/dep/src/main.d"
+    ],
+    "directory": "/home/brist0l/programming/projects/Gameboy",
+    "output": "build/obj/src/main.o"
+  },
+  {
+    "file": "src/ppu/ppu_debug.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-o",
+      "build/obj/src/ppu/ppu_debug.o",
+      "src/ppu/ppu_debug.c",
+      "-c",
+      "-Wall",
+      "-Wextra",
+      "-Wswitch",
+      "-O3",
+      "-Iinclude",
+      "-g",
+      "-MMD",
+      "-MP",
+      "-MF",
+      "build/dep/src/ppu/ppu_debug.d"
+    ],
+    "directory": "/home/brist0l/programming/projects/Gameboy",
+    "output": "build/obj/src/ppu/ppu_debug.o"
+  }
+]

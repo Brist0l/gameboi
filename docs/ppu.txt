@@ -63,11 +63,28 @@
  * 			       and
  * 			0x9c00 to 0x9fff -------> 2nd background map
  *
- * A background map consists of 32x32 bytes representing tile numbers organized row by
+ * A background map consists of 32x32 bytes representing "tile numbers" organized row by
  * row. This means that the first byte in a background map is the Tile Number of the
  * Tile at the very top left. The byte after is the Tile Number of the Tile to the
  * right of it and so on. The 33rd byte would represent the Tile Number of the
  * leftmost tile in the second tile row.
+ * 
+ * 0x9c00 - 0x9fff = 1024 and 32x32 = 1024. That means that the first byte would give me
+ * 0x0 then the second would give me of 0x1 and so on and so forth. The tile would in the
+ * 0x8000 to 0x97ff range only, addressing mode will be determined by LCDC.4 
+ * This is memorydump of tile map data from the 6th blargg's test. 8000 method is being used.
+ *
+ * 9800 => 30 36 2d 6c 64 20 72 2c 72 20 20 20 20 20 20 20
+ * 9810 => 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20
+ * 9820 => 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20
+ * 
+ * This means the 30th tile should be on the top left , then beside that should be the 36th 
+ * tile and so on and so forth.
+ * The formula I used was,
+ *		uint16_t start_addr = base_ptr + 16 * (memory_read(background_mem));
+ * 
+ * So With LCDC.4 I got to know the base_ptr (select_background() -> select_addressing_method()) and 
+ * with select_background() I got to know the background_mem.
  *
  * =======OAM:=====================================
  *
@@ -83,5 +100,65 @@
  * Byte 2: Tile index (NEED TO READ) (TODO)
  * Byte 3: Attributes flag (NEED TO REFER) (TODO)
  *
- *
  */
+
+
+=======================Function Docs:==========================
+
+1) void make_tile(uint8_t test_data[]):
+
+What this does is convert the linear data into tiles.
+Tiles are of 8x8 pixels , that's 16 Bytes(check "tile" section for
+more info). 
+
+	uint8_t test_data[] = {
+		    0x3C, 0x7E,
+		    0x42, 0x42,
+		    0x42, 0x42,
+		    0x42, 0x42,
+		    0x7E, 0x5E,
+		    0x7E, 0x0A,
+		    0x7C, 0x56,
+		    0x38, 0x7C
+		};
+
+So assume we read these 16 Bytes of data from the VRAM. 
+We now iterate over this data taking 2 bytes at a time.
+
+	uint8_t lsbs;
+	uint8_t msbs;
+	for(int data = 0;data < 16;data += 2){
+		lsbs = test_data[data];
+		msbs = test_data[data + 1];
+
+So basically we take the first two elements and store it
+in lsbs and msbs
+
+lsbs = 0x3C (0b00111100)
+msbs = 0x7E (0b01111110)
+
+Then we need each individual bit to work with, 
+
+		#define STD_LSB 0b00000001
+		#define STD_MSB 0b00000010
+
+		for(int bit = 7;bit >= 0;bit--){
+			uint8_t the_lsb = (lsbs >> bit) & STD_LSB;
+			uint8_t the_msb = (msbs >> (bit-1)) & STD_MSB;
+
+So now what's happening is that there are 8 bits and we iterate over
+them (i.e. from 0 to 7), starting from the most signficant bit.
+We get the MSb from the lsbs by frist shifting it to the rightmost
+postion and ANDing it out.
+We do the same with the 2nd most MSb of the MSB , we are doing this cuz
+we need to make the colour grades. So it's safe to assume that `the_msb`
+is of 2 bits and `the_lsb` is of 1 bit. So we just OR them together to
+get the colour grade.
+
+			uint8_t pixel = the_lsb | the_msb;
+
+Then we simply update the tile array.
+
+			tile[t_y][t_x++] = pixel;
+
+And outside the loop we increment t_y and set t_x to 0.

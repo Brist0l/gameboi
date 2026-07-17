@@ -1,4 +1,4 @@
-journey.txt
+docs/journey.txt
 
 #Logs
 logs/
@@ -6,3 +6,5 @@ logs/
 # Build outputs
 build/
 bin/
+
+*.plist

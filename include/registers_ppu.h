@@ -1,6 +1,8 @@
 #ifndef REGISTERS_PPU_H
 #define REGISTERS_PPU_H
 
+#include<stdint.h>
+
 uint8_t LCDC_lcd_ppu_enable_bit_7();
 uint8_t LCDC_lcd_window_tile_map_select_6();
 uint8_t LCDC_lcd_window_display_enable_5();
@@ -10,5 +12,9 @@ uint8_t LCDC_sprite_size_2();
 uint8_t LCDC_sprite_enable_1();
 uint8_t LCDC_background_window_enable();
 uint8_t getLY();
+uint8_t getSCY();
+uint8_t getSCX();
+uint8_t getWY();
+uint8_t getWX();
 
 #endif /* REGISTERS_PPU_H */

@@ -12,5 +12,6 @@ void game_draw(struct Game *g);
 bool draw(struct Game *g);
 void render_screen(struct Game *g);
 bool clear_screen(struct Game *g);
+void show_background();
 
 #endif

@@ -54,7 +54,9 @@ int main(int argc,char* argv[]){
 		}
 	}
 
-	_vramdump();
+	//_vramdump();
+	_memorydump(0x9800,0x9c00);
+	//show_background();
 
 	game_free(&g);
 }

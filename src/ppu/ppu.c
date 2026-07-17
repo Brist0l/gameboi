@@ -1,6 +1,7 @@
 #include<SDL3/SDL.h>
 #include<SDL3/SDL_main.h>
 #include<stdbool.h>
+#include<stdlib.h>
 
 #include "display.h"
 #include "debug.h"
@@ -23,6 +24,41 @@ static uint16_t background_mem = 0x9800;
 static uint16_t window_mem = 0x9800;
 static uint16_t window_mem_end;
 static uint16_t background_mem_end;
+static uint16_t base_ptr;
+static uint8_t tile_num;
+
+void background_to_display(){
+	int scy = getSCY(); // Top
+	int scx = getSCX(); // Left
+
+	int bottom = (scy + 143) % 256;
+	int right = (scx + 159) % 256;
+
+	for(int y = 0; y < WINDOW_HEIGHT; y++)
+		for(int x = 0; x < WINDOW_WIDTH; x++)
+			display[y][x] = background[-(20) + y][scx +x];
+
+}
+
+void tile_8800_method(){
+	//signed addressing
+
+	dprintf("8800 method");
+	base_ptr = 0x9000;
+	exit(1);
+}
+
+
+void select_addressing_method(){
+	if(LCDC_tile_data_select_4() == 0)
+		tile_8800_method();
+	else{
+		//unsigned addressing
+		//Tiles 0 - 127 are in block 0
+		//Tiles 128  - 255 are in block 1
+		base_ptr = 0x8000;
+	}
+}
 
 void make_tile(uint8_t test_data[]){
 	int t_x = 0; // Goes Right
@@ -66,6 +102,8 @@ uint16_t select_background(){
 	//
 	// Returns the ending address of the background.
 
+	select_addressing_method();
+
 	if(LCDC_lcd_window_tile_map_select_6() == 0){
 		background_mem = 0x9800;
 		return 0x9bff;
@@ -74,27 +112,71 @@ uint16_t select_background(){
 		background_mem = 0x9c00;
 		return 0x9fff;
 	}
+
 }
 
 void set_background(){
 	uint8_t data[16];
+	int background_y = 0;
+	int background_x = 0;
 
+	// Sets background memory as well now it sets the
+	// background_mem_end
 	background_mem_end = select_background();
 
-	while(background_mem >= background_mem_end){
+	while(background_mem_end > background_mem){
+		// Assume that you have a tile number 0.
+		// So that means that it would start at
+		// 0x8000 and then it would read 16 bytes
+		// from there , i.e. till 0x800f
+		//
+		// So address can be calculated like
+		//
+		// start_addr = 0x8000 + 16 * (tile_num)
+
+		uint16_t start_addr = base_ptr + 16 * (memory_read(background_mem));
+		background_mem++;
+
 		for(int i = 0; i < 16; i++)
-			data[i] = memory_read(background_mem + i);
+			data[i] = memory_read(start_addr + i);
 
-		make_tile(data);
+		make_tile(data); // form the data into a tile
 
+
+		// Set the background as the tile
 		for(int y = 0; y < 8;y++){
 			for(int x = 0; x < 8;x++){
-				background[y][x] = tile[y][x];
+				background[background_y + y][background_x + x] = tile[y][x];
 				dprintf("d_y : %d\nd_x: %d\n",d_y,d_x);
 			}
 		}
 
-		background_mem += 16;
+		if(background_x == 256){
+			dprintf("Setting background_x to 0!!!\n");
+			background_x = 0;
+			background_y += 8;
+
+		}
+		else
+			background_x += 8;
+
+
+		if(background_y >= 256){
+			dprintf("Setting background_y to 0!!!\n");
+			background_y = 0;
+		}
+
+	}
+
+	background_to_display();
+}
+
+void show_background(){
+	for(int y = 0; y < 256;y++){
+		for(int x = 0; x < 256;x++){
+			dprintf("%02b ",background[y][x]);
+		}
+		dprintf("\n");
 	}
 }
 
@@ -157,17 +239,26 @@ bool draw(struct Game *g){
 
 	set_background();
 
-	make_tile(test_data);
+	//make_tile(test_data);
 
-	show_tile(tile);
+	//show_tile(tile);
 }
 
 SDL_Color dmg_palette[4] = {
     {155, 188, 15, 255},
     {139, 172, 15, 255},
     {48, 98, 48, 255},
-    {15, 56, 15, 255}
+    {15, 56, 15, 0}
 };
+
+bool clear_screen(struct Game *g){
+	memset(display, 0, sizeof(display));
+
+    	SDL_SetRenderDrawColor(g->renderer, 0, 0, 0, 255);
+    	SDL_RenderClear(g->renderer);
+    	SDL_RenderPresent(g->renderer);
+    	return true;
+}
 
 void render_screen(struct Game *g){
 
@@ -177,7 +268,7 @@ void render_screen(struct Game *g){
 
   	for(int y = 0; y < WINDOW_HEIGHT; y++) {
         	for(int x = 0; x < WINDOW_WIDTH; x++) {
-			uint8_t color = background[y][x] & 0x03;
+			uint8_t color = display[y][x] & 0x03;
 
 			SDL_Color c = dmg_palette[3 - color]; // if you want 0 = darkest, 3 = lightest
 
@@ -189,13 +280,4 @@ void render_screen(struct Game *g){
     	}
 
     	SDL_RenderPresent(g->renderer); // update the rendering content
-}
-
-bool clear_screen(struct Game *g){
-	memset(display, 0, sizeof(display));
-
-    	SDL_SetRenderDrawColor(g->renderer, 0, 0, 0, 255);
-    	SDL_RenderClear(g->renderer);
-    	SDL_RenderPresent(g->renderer);
-    	return true;
 }

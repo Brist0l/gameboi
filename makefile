@@ -1,10 +1,7 @@
 .DEFAULT_GOAL := run
 .PHONY : clean
 
-sources := \
-    $(wildcard src/*.c) \
-    $(wildcard src/cpu/*.c) \
-    $(wildcard src/ppu/*.c)
+sources := $(shell find src -name '*.c')
 
 run_sources := $(filter-out src/ppu_debug.c,$(sources))
 debug_sources := $(filter-out src/main.c,$(sources))
@@ -39,6 +36,6 @@ ppu_debug: $(ppu_debug_objects) | $(BINDIR)
 deps := $(patsubst %.c,$(DEPDIR)/%.d,$(sources))
 
 clean:
-	rm -f $(run_objects) $(ppu_debug_objects) $(deps) $(BINDIR)/run $(BINDIR)/ppu_debug
+	rm -rf build bin
 
 -include $(deps)
