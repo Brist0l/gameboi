@@ -33,7 +33,7 @@ int main(int argc,char* argv[]){
 
 	memory[0xff44] = 0x90; //  Just to pass the infinite loop
 
-	int cnt = 0xffff;
+	int cnt = 0xfffff;
 
 	//_fillregisters();
 

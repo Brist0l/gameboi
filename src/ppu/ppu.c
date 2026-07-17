@@ -7,6 +7,7 @@
 #include "debug.h"
 #include "memory.h"
 #include "registers_ppu.h"
+#include "background.h"
 
 #define STD_LSB 0b00000001
 #define STD_MSB 0b00000010
@@ -17,195 +18,10 @@ uint8_t window[256][256] = {0};
 
 uint8_t tile[8][8] = {0};
 
-static int d_x = 0;
-static int d_y = 0;
 static int mem = 0x9800;
-static uint16_t background_mem = 0x9800;
 static uint16_t window_mem = 0x9800;
 static uint16_t window_mem_end;
-static uint16_t background_mem_end;
-static uint16_t base_ptr;
 static uint8_t tile_num;
-
-void background_to_display(){
-	int scy = getSCY(); // Top
-	int scx = getSCX(); // Left
-
-	int bottom = (scy + 143) % 256;
-	int right = (scx + 159) % 256;
-
-	for(int y = 0; y < WINDOW_HEIGHT; y++)
-		for(int x = 0; x < WINDOW_WIDTH; x++)
-			display[y][x] = background[-(20) + y][scx +x];
-
-}
-
-void tile_8800_method(){
-	//signed addressing
-
-	dprintf("8800 method");
-	base_ptr = 0x9000;
-	exit(1);
-}
-
-
-void select_addressing_method(){
-	if(LCDC_tile_data_select_4() == 0)
-		tile_8800_method();
-	else{
-		//unsigned addressing
-		//Tiles 0 - 127 are in block 0
-		//Tiles 128  - 255 are in block 1
-		base_ptr = 0x8000;
-	}
-}
-
-void make_tile(uint8_t test_data[]){
-	int t_x = 0; // Goes Right
-	int t_y = 0; // Goes Down
-	uint8_t lsbs;
-	uint8_t msbs;
-
-	for(int data = 0;data < 16;data += 2){
-		lsbs = test_data[data];
-		msbs = test_data[data + 1];
-
-		dprintf("Working on Row number: %d\n",data - 1);
-		dprintf("Working with the LSB bytes: 0b%08b (0x%02x)\n",lsbs,lsbs);
-		dprintf("Working with the MSB bytes: 0b%08b (0x%02x)\n",msbs,msbs);
-		dprintf("\n");
-
-		for(int bit = 7;bit >= 0;bit--){
-			uint8_t the_lsb = (lsbs >> bit) & STD_LSB;
-			uint8_t the_msb = (msbs >> (bit-1)) & STD_MSB;
-
-			dprintf("Standard form of LSB: 0b%08b (0x%02x)\n",the_lsb,the_lsb);
-			dprintf("Standard form of MSB: 0b%08b (0x%02x)\n",the_msb,the_msb);
-
-			uint8_t pixel = the_lsb | the_msb;
-
-			dprintf("Pixel: 0b%02b (0x%02x)\n",pixel,pixel);
-			dprintf("\n");
-
-			tile[t_y][t_x++] = pixel;
-		}
-		t_y++;
-		t_x = 0;
-	}
-}
-
-
-
-uint16_t select_background(){
-	// This will select the background map depending
-	// on the LCDC bit
-	//
-	// Returns the ending address of the background.
-
-	select_addressing_method();
-
-	if(LCDC_lcd_window_tile_map_select_6() == 0){
-		background_mem = 0x9800;
-		return 0x9bff;
-	}
-	else{
-		background_mem = 0x9c00;
-		return 0x9fff;
-	}
-
-}
-
-void set_background(){
-	uint8_t data[16];
-	int background_y = 0;
-	int background_x = 0;
-
-	// Sets background memory as well now it sets the
-	// background_mem_end
-	background_mem_end = select_background();
-
-	while(background_mem_end > background_mem){
-		// Assume that you have a tile number 0.
-		// So that means that it would start at
-		// 0x8000 and then it would read 16 bytes
-		// from there , i.e. till 0x800f
-		//
-		// So address can be calculated like
-		//
-		// start_addr = 0x8000 + 16 * (tile_num)
-
-		uint16_t start_addr = base_ptr + 16 * (memory_read(background_mem));
-		background_mem++;
-
-		for(int i = 0; i < 16; i++)
-			data[i] = memory_read(start_addr + i);
-
-		make_tile(data); // form the data into a tile
-
-
-		// Set the background as the tile
-		for(int y = 0; y < 8;y++){
-			for(int x = 0; x < 8;x++){
-				background[background_y + y][background_x + x] = tile[y][x];
-				dprintf("d_y : %d\nd_x: %d\n",d_y,d_x);
-			}
-		}
-
-		if(background_x == 256){
-			dprintf("Setting background_x to 0!!!\n");
-			background_x = 0;
-			background_y += 8;
-
-		}
-		else
-			background_x += 8;
-
-
-		if(background_y >= 256){
-			dprintf("Setting background_y to 0!!!\n");
-			background_y = 0;
-		}
-
-	}
-
-	background_to_display();
-}
-
-void show_background(){
-	for(int y = 0; y < 256;y++){
-		for(int x = 0; x < 256;x++){
-			dprintf("%02b ",background[y][x]);
-		}
-		dprintf("\n");
-	}
-}
-
-void show_tile(uint8_t tile[8][8]){
-	for(int y = 0; y < 8;y++){
-		for(int x = 0; x < 8;x++){
-			dprintf("%02b ",tile[y][x]);
-		}
-		dprintf("\n");
-	}
-
-	for(int y = 0; y < 8;y++){
-		for(int x = 0; x < 8;x++){
-			display[d_y + y][d_x + x] = tile[y][x];
-			dprintf("d_y : %d\nd_x: %d\n",d_y,d_x);
-		}
-	}
-
-	if(d_x + 8>= WINDOW_WIDTH)
-		d_x = 0;
-	else
-		d_x += 8;
-
-	if(d_y + 8 >= WINDOW_HEIGHT)
-		d_y = 0;
-	else
-		d_y += 8;
-
-}
 
 bool draw(struct Game *g){
 	// This will handle "which" pixels need to light up.
@@ -248,7 +64,7 @@ SDL_Color dmg_palette[4] = {
     {155, 188, 15, 255},
     {139, 172, 15, 255},
     {48, 98, 48, 255},
-    {15, 56, 15, 0}
+    {15, 56, 15, 255}
 };
 
 bool clear_screen(struct Game *g){
@@ -274,7 +90,7 @@ void render_screen(struct Game *g){
 
 			SDL_SetRenderDrawColor(g->renderer,c.r,c.g,c.b,c.a);
 
-                	SDL_FRect rect = {x * SCALE * 4, y * SCALE * 4, SCALE * 4, SCALE * 4};
+                	SDL_FRect rect = {x * SCALE, y * SCALE, SCALE, SCALE};
                 	SDL_RenderFillRect(g->renderer, &rect);
         	}
     	}
