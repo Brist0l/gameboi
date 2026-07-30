@@ -43,6 +43,10 @@ uint8_t LCDC_background_window_enable(){
 	return (((memory_read(0xff40)) & 0b00000001) >> 0 );
 }
 
+void LCDC_show(){
+	printf("LCDC : 0b%08b\n",memory_read(0xff40));
+}
+
 uint8_t getSCY(){
 	return memory_read(0xff42);
 }
@@ -53,6 +57,10 @@ uint8_t getSCX(){
 
 uint8_t getLY(){
 	return memory_read(0xff44);
+}
+
+void showLY(){
+	printf("LY: %d\n", memory_read(0xff44));
 }
 
 uint8_t getWY(){

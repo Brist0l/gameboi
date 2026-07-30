@@ -14,6 +14,7 @@ bool gb_doc = true;
 struct Game* g = NULL;
 
 int key;
+unsigned int t_cycles;
 
 int main(int argc,char* argv[]){
 	if(argc < 2){
@@ -62,7 +63,8 @@ int main(int argc,char* argv[]){
 			//dprintf("Running Game, 0x%x is pressed\n",);
 
 		//	clear_screen(g);
-			execute();
+			t_cycles = execute();
+			dprintf("T Cycles: %d\n",t_cycles);
 
 			//Uint32 now = SDL_GetTicks();
 			//if((now - last) >= 1000/60){
@@ -70,7 +72,7 @@ int main(int argc,char* argv[]){
 			//}
 
 			render_screen(g);
-			SDL_Delay(1000); // i.e. 60Hz
+			//SDL_Delay(1000); // i.e. 60Hz
 		}
 	}
 

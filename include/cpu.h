@@ -19,6 +19,8 @@ struct registers{
 	uint16_t PC; // Program Counter
 	
 	uint8_t F; // Flag register , used with operations such as BIT
+	
+	uint8_t IME; // Interrupt Master Enable flag
 };
 
 /* Flag register:
@@ -35,7 +37,7 @@ struct registers{
 
 extern struct registers cpu; // an extern struct with the name "cpu"
 			     
-void execute();
+unsigned int execute(); // It returns the number of cycles
 unsigned short get_u16();
 
 

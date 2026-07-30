@@ -10,6 +10,7 @@
 #define WINDOW_WIDTH 160
 #define WINDOW_HEIGHT 144
 #define SCALE 8
+#define BACKGROUND_SCALE 4
 
 struct Game{
 	SDL_Window *window;
@@ -20,8 +21,10 @@ struct Game{
 	bool keypad[16];
 };
 
-bool game_new(struct Game **game);
+
+bool game_new(struct Game **game,const char* title,int width,int height,int scale);
 void game_free(struct Game **game);
 void game_events(struct Game *g,int* key);
+
 
 #endif /* DISPLAY_H */

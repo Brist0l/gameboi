@@ -10,10 +10,8 @@
 #include "cpu_incdec.h"
 #include "cpu_rotate.h"
 #include "cpu_stack.h"
-#include "cpu_shift.h"
 #include "cpu_misc.h"
 #include "cpu_cb.h"
-#include "registers_cpu.h"
 #include "flags.h"
 
 #include "memory.h"
@@ -63,6 +61,8 @@ uint16_t HL;
 
 long long instr_cnt = 1;
 
+unsigned int t_cycles = 0;
+
 unsigned short get_u16(){
 	lsb = memory_read(++cpu.PC);
 	dprintf("LSB: 0x%04x\n",lsb);
@@ -78,27 +78,11 @@ unsigned short get_u16(){
 	return u16;
 }
 
-void execute(){
-
+unsigned int execute(){
 	logmsg("execute",true);
 
-
-	//if(cpu.PC >= 0x00a8 && cpu.PC < 0x00e0){
-		//dprintf(ANSI_COLOR_BLUE);
-		//dprintf(".DB:\t");
-		//dprintf(ANSI_COLOR_RESET);
-		//dprintf(ANSI_COLOR_GREEN);
-		//dprintf("0x%02x\n",memory[cpu.PC]);
-		//dprintf(ANSI_COLOR_RESET);
-	//}
-
+	// Fetch
 	unsigned char opcode = memory_read(cpu.PC);
-
-	//printf(ANSI_COLOR_RED);
-	//dprintf("0x%04x\t",i);
-	//printf(ANSI_COLOR_RESET);
-
-	//printf(ANSI_COLOR_GREEN);
 
 	dprintf("\nRegister PC before: 0x%04x\n\n",cpu.PC);
 	dprintf("opcode: 0x%02x\n",opcode);
@@ -110,6 +94,7 @@ void execute(){
 			// Do nothing
 
 			dprintf("NOP\n");
+			t_cycles += 4;
 			break;
 
 		case 0x01:
@@ -118,12 +103,14 @@ void execute(){
 			// store u16 in BC
 
 			opcd_ld_bc_u16();
+			t_cycles += 12;
 			break;
 
 		case 0x02:
 			// LD (BC),A
 
 			opcd_ld_bc_a();
+			t_cycles += 8;
 			break;
 
 		case 0x03:
@@ -131,6 +118,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_inc_bc();
+			t_cycles += 8;
 			break;
 
 		case 0x04:
@@ -138,6 +126,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_inc_b();
+			t_cycles += 4;
 			break;
 
 		case 0x05:
@@ -145,6 +134,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_dec_b();
+			t_cycles += 4;
 			break;
 
 		case 0x06:
@@ -153,12 +143,14 @@ void execute(){
 			// Put u8 into B
 
 			opcd_ld_b_u8();
+			t_cycles += 8;
 			break;
 
 		case 0x07:
 			// RLCA
 
 			opcd_rlca();
+			t_cycles += 4;
 			break;
 
 		case 0x08:
@@ -166,6 +158,7 @@ void execute(){
 			// Put the SP at the addr u16
 
 			opcd_ld_u16_sp();
+			t_cycles += 20;
 			break;
 
 		case 0x09:
@@ -173,18 +166,21 @@ void execute(){
 			// add BC to HL and store it again in HL
 
 			opcd_add_hl_bc();
+			t_cycles += 8;
 			break;
 
 		case 0x0a:
 			// LD A, (BC)
 
 			opcd_ld_a_bc();
+			t_cycles += 8;
 			break;
 
 		case 0x0b:
 			// DEC BC
 
 			opcd_dec_bc();
+			t_cycles += 8;
 			break;
 
 		case 0x0c:
@@ -193,6 +189,7 @@ void execute(){
 			// increase val of C by 1
 
 			opcd_inc_c();
+			t_cycles += 4;
 			break;
 
 		case 0x0d:
@@ -200,6 +197,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_dec_c();
+			t_cycles += 4;
 			break;
 
 		case 0x0e:
@@ -208,12 +206,14 @@ void execute(){
 			// Put the values of u8 into C
 
 			opcd_ld_c_u8();
+			t_cycles += 8;
 			break;
 
 		case 0x0f:
 			// RRCA
 
 			opcd_rrca();
+			t_cycles += 4;
 			break;
 
 		case 0x11:
@@ -222,6 +222,7 @@ void execute(){
 			// store u16 in DE
 
 			opcd_ld_de_u16();
+			t_cycles += 12;
 			break;
 
 		case 0x12:
@@ -230,6 +231,7 @@ void execute(){
 			// store A in the memory location DE
 
 			opcd_ld_de_a();
+			t_cycles += 8;
 			break;
 
 		case 0x13:
@@ -237,6 +239,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_inc_de();
+			t_cycles += 8;
 			break;
 
 		case 0x14:
@@ -244,6 +247,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_inc_d();
+			t_cycles += 4;
 			break;
 
 		case 0x15:
@@ -251,6 +255,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_dec_d();
+			t_cycles += 4;
 			break;
 
 		case 0x16:
@@ -258,6 +263,7 @@ void execute(){
 			// lenght is 2 bytes
 
 			opcd_ld_d_u8();
+			t_cycles += 8;
 			break;
 
 		case 0x17:
@@ -266,6 +272,7 @@ void execute(){
 			// Same as RLC but Z flag always 0
 
 			opcd_rla();
+			t_cycles += 4;
 			break;
 
 		case 0x18:
@@ -274,12 +281,14 @@ void execute(){
 			// lenght is 2 bytes
 
 			opcd_jr_u8();
+			t_cycles += 12;
 			break;
 
 		case 0x19:
 			// ADD HL, DE
 
 			opcd_add_hl_de();
+			t_cycles += 8;
 			break;
 
 		case 0x1a:
@@ -288,12 +297,14 @@ void execute(){
 			// put contents at addr specified by DE into A
 
 			opcd_ld_a_de();
+			t_cycles += 8;
 			break;
 
 		case 0x1b:
 			// DEC DE
 
 			opcd_dec_de();
+			t_cycles += 8;
 			break;
 
 		case 0x1c:
@@ -301,6 +312,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_inc_e();
+			t_cycles += 4;
 			break;
 
 		case 0x1d:
@@ -308,6 +320,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_dec_e();
+			t_cycles += 4;
 			break;
 
 		case 0x1e:
@@ -315,6 +328,7 @@ void execute(){
 			// lenght is 2 bytes
 
 			opcd_ld_e_u8();
+			t_cycles += 8;
 			break;
 
 		case 0x1f:
@@ -326,6 +340,7 @@ void execute(){
 			// Just like RR A but Z flag is always 0
 
 			opcd_rra();
+			t_cycles += 4;
 			break;
 
 		case 0x20:
@@ -335,6 +350,11 @@ void execute(){
 			// jump relative to (current_addr + addr)
 
 			opcd_jr_nz_u8();
+
+			if(getz() == 0)
+				t_cycles += 12;
+			else
+				t_cycles += 8;
 			break;
 
 		case 0x21:
@@ -344,6 +364,7 @@ void execute(){
 			// Put u16's msb in H and lsb in L
 
 			opcd_ld_hl_u16();
+			t_cycles += 12;
 			break;
 
 		case 0x22:
@@ -353,6 +374,7 @@ void execute(){
 			// increment HL
 
 			opcd_ld_hlplus_a();
+			t_cycles += 8;
 			break;
 
 		case 0x23:
@@ -361,6 +383,7 @@ void execute(){
 			// Add 1 to HL
 
 			opcd_inc_hl();
+			t_cycles += 8;
 			break;
 
 		case 0x24:
@@ -368,6 +391,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_inc_h();
+			t_cycles += 4;
 			break;
 
 		case 0x25:
@@ -375,6 +399,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_dec_h();
+			t_cycles += 4;
 			break;
 
 		case 0x26:
@@ -383,12 +408,14 @@ void execute(){
 			// Put u8 into H
 
 			opcd_ld_h_u8();
+			t_cycles += 8;
 			break;
 
 		case 0x27:
 			//DAA
 
 			opcd_daa();
+			t_cycles += 4;
 			break;
 
 		case 0x28:
@@ -397,6 +424,11 @@ void execute(){
 			// lenght is 2 bytes
 
 			opcd_jr_z_u8();
+
+			if(getz() == 1)
+				t_cycles += 12;
+			else
+				t_cycles += 8;
 			break;
 
 		case 0x29:
@@ -405,6 +437,7 @@ void execute(){
 			// Add HL to HL and store in HL
 
 			opcd_add_hl_hl();
+			t_cycles += 8;
 			break;
 
 		case 0x2a:
@@ -413,12 +446,14 @@ void execute(){
 			// put data at HL into  A and increment HL
 
 			opcd_ld_a_hlplus();
+			t_cycles += 8;
 			break;
 
 		case 0x2b:
 			// DEC HL
 
 			opcd_dec_hl();
+			t_cycles += 8;
 			break;
 
 		case 0x2c:
@@ -426,6 +461,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_inc_l();
+			t_cycles += 4;
 			break;
 
 		case 0x2d:
@@ -433,6 +469,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_dec_l();
+			t_cycles += 4;
 			break;
 
 		case 0x2e:
@@ -441,6 +478,7 @@ void execute(){
 			// Put the value of u8 in the L register
 
 			opcd_ld_l_u8();
+			t_cycles += 8;
 			break;
 
 		case 0x2f:
@@ -450,13 +488,20 @@ void execute(){
 			// contents of register A.
 
 			opcd_cpl();
+			t_cycles += 4;
 			break;
 
 		case 0x30:
 			// JR NC, u8
 			// JUMP relative if NotC to (current addr + n)
 			// lenght is 2 bytes
+
 			opcd_jr_nc_u8();
+
+			if(getC() == 0)
+				t_cycles += 12;
+			else
+				t_cycles += 8;
 			break;
 
 		case 0x31:
@@ -466,6 +511,7 @@ void execute(){
 			// put the u16 in the SP register
 
 			opcd_ld_sp_u16();
+			t_cycles += 12;
 			break;
 
 		case 0x32:
@@ -475,18 +521,21 @@ void execute(){
 			// Put A into memory address HL and then decrement HL
 
 			opcd_ld_hlminus_a();
+			t_cycles += 8;
 			break;
 
 		case 0x33:
 			// INC SP
 
 			opcd_inc_sp();
+			t_cycles += 8;
 			break;
 
 		case 0x34:
 			// INC (HL)
 
 			opcd_inc_at_hl();
+			t_cycles += 12;
 			break;
 
 		case 0x35:
@@ -494,6 +543,7 @@ void execute(){
 			// Decrement the value at HL by 1
 
 			opcd_dec_at_hl();
+			t_cycles += 12;
 			break;
 
 		case 0x36:
@@ -501,6 +551,7 @@ void execute(){
 			// Store u8 at the address of HL
 
 			opcd_ld_hl_u8();
+			t_cycles += 12;
 			break;
 
 		case 0x37:
@@ -508,6 +559,7 @@ void execute(){
 			// Set the Carry flag to 1
 
 			opcd_scf();
+			t_cycles += 4;
 			break;
 
 		case 0x38:
@@ -516,12 +568,18 @@ void execute(){
 			// lenght is 2 bytes
 
 			opcd_jr_c_u8();
+
+			if(getC() == 1)
+				t_cycles += 12;
+			else
+				t_cycles += 8;
 			break;
 
 		case 0x39:
 			// ADD HL, SP
 
 			opcd_add_hl_sp();
+			t_cycles += 8;
 			break;
 
 		case 0x3a:
@@ -530,12 +588,14 @@ void execute(){
 			// put data at HL into  A and decrement HL
 
 			opcd_ld_a_hlmin();
+			t_cycles += 8;
 			break;
 
 		case 0x3b:
 			// DEC SP
 
 			opcd_dec_sp();
+			t_cycles += 8;
 			break;
 
 		case 0x3c:
@@ -543,6 +603,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_inc_a();
+			t_cycles += 4;
 			break;
 
 		case 0x3d:
@@ -550,6 +611,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_dec_a();
+			t_cycles += 4;
 			break;
 
 		case 0x3e:
@@ -557,12 +619,14 @@ void execute(){
 			// lenght is 2 bytes
 
 			opcd_ld_a_u8();
+			t_cycles += 8;
 			break;
 
 		case 0x3f:
 			// CCF
 
 			opcd_ccf();
+			t_cycles += 4;
 			break;
 
 		case 0x40:
@@ -571,6 +635,7 @@ void execute(){
 			// Put B into B
 
 			opcd_ld_b_b();
+			t_cycles += 4;
 			break;
 
 		case 0x41:
@@ -578,6 +643,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_ld_b_c();
+			t_cycles += 4;
 			break;
 
 		case 0x42:
@@ -585,6 +651,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_ld_b_d();
+			t_cycles += 4;
 			break;
 
 		case 0x43:
@@ -592,6 +659,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_ld_b_e();
+			t_cycles += 4;
 			break;
 
 		case 0x44:
@@ -599,6 +667,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_ld_b_h();
+			t_cycles += 4;
 			break;
 
 		case 0x45:
@@ -606,6 +675,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_ld_b_l();
+			t_cycles += 4;
 			break;
 
 		case 0x46:
@@ -614,6 +684,7 @@ void execute(){
 			// put data at HL into  B
 
 			opcd_ld_b_hl();
+			t_cycles += 8;
 			break;
 
 		case 0x47:
@@ -621,6 +692,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_ld_b_a();
+			t_cycles += 4;
 			break;
 
 		case 0x48:
@@ -629,6 +701,7 @@ void execute(){
 			// Put value of B into C
 
 			opcd_ld_c_b();
+			t_cycles += 4;
 			break;
 
 		case 0x49:
@@ -637,6 +710,7 @@ void execute(){
 			// Put value of C into C
 
 			opcd_ld_c_c();
+			t_cycles += 4;
 			break;
 
 		case 0x4a:
@@ -645,6 +719,7 @@ void execute(){
 			// Put value of D into C
 
 			opcd_ld_c_d();
+			t_cycles += 4;
 			break;
 
 		case 0x4b:
@@ -653,6 +728,7 @@ void execute(){
 			// Put value of E into C
 
 			opcd_ld_c_e();
+			t_cycles += 4;
 			break;
 
 		case 0x4c:
@@ -661,6 +737,7 @@ void execute(){
 			// Put value of H into C
 
 			opcd_ld_c_h();
+			t_cycles += 4;
 			break;
 
 		case 0x4d:
@@ -669,6 +746,7 @@ void execute(){
 			// Put value of L into C
 
 			opcd_ld_c_l();
+			t_cycles += 4;
 			break;
 
 		case 0x4e:
@@ -677,6 +755,7 @@ void execute(){
 			// put data at HL into  C
 
 			opcd_ld_c_hl();
+			t_cycles += 8;
 			break;
 
 		case 0x4f:
@@ -685,6 +764,7 @@ void execute(){
 			// Put value of A into C
 
 			opcd_ld_c_a();
+			t_cycles += 4;
 			break;
 
 		case 0x50:
@@ -692,6 +772,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_ld_d_b();
+			t_cycles += 4;
 			break;
 
 		case 0x51:
@@ -699,6 +780,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_ld_d_c();
+			t_cycles += 4;
 			break;
 
 		case 0x52:
@@ -706,6 +788,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_ld_d_d();
+			t_cycles += 4;
 			break;
 
 		case 0x53:
@@ -713,6 +796,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_ld_d_e();
+			t_cycles += 4;
 			break;
 
 		case 0x54:
@@ -720,6 +804,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_ld_d_h();
+			t_cycles += 4;
 			break;
 
 		case 0x55:
@@ -727,6 +812,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_ld_d_l();
+			t_cycles += 4;
 			break;
 
 		case 0x56:
@@ -735,6 +821,7 @@ void execute(){
 			// put data at HL into  D
 
 			opcd_ld_d_hl();
+			t_cycles += 8;
 			break;
 
 		case 0x57:
@@ -742,36 +829,42 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_ld_d_a();
+			t_cycles += 4;
 			break;
 
 		case 0x58:
 			// LOAD E, B
 
 			opcd_ld_e_b();
+			t_cycles += 4;
 			break;
 
 		case 0x59:
 			// LOAD E, C
 
 			opcd_ld_e_c();
+			t_cycles += 4;
 			break;
 
 		case 0x5a:
 			// LOAD E, D
 
 			opcd_ld_e_d();
+			t_cycles += 4;
 			break;
 
 		case 0x5b:
 			// LOAD E, E
 
 			opcd_ld_e_e();
+			t_cycles += 4;
 			break;
 
 		case 0x5c:
 			// LOAD E, H
 
 			opcd_ld_e_h();
+			t_cycles += 4;
 			break;
 
 
@@ -779,12 +872,14 @@ void execute(){
 			//LD E, L
 
 			opcd_ld_e_l();
+			t_cycles += 4;
 			break;
 
 		case 0x5e:
 			//LD E,(HL)
 
 			opcd_ld_e_hl();
+			t_cycles += 8;
 			break;
 
 		case 0x5f:
@@ -792,48 +887,56 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_ld_e_a();
+			t_cycles += 4;
 			break;
 
 		case 0x60:
 			// LOAD H, B
 
 			opcd_ld_h_b();
+			t_cycles += 4;
 			break;
 
 		case 0x61:
 			// LOAD H, C
 
 			opcd_ld_h_c();
+			t_cycles += 4;
 			break;
 
 		case 0x62:
 			// LOAD H, D
 
 			opcd_ld_h_d();
+			t_cycles += 4;
 			break;
 
 		case 0x63:
 			// LOAD H, E
 
 			opcd_ld_h_e();
+			t_cycles += 4;
 			break;
 
 		case 0x64:
 			// LOAD H, H
 
 			opcd_ld_h_h();
+			t_cycles += 4;
 			break;
 
 		case 0x65:
 			// LOAD H, L
 
 			opcd_ld_h_l();
+			t_cycles += 4;
 			break;
 
 		case 0x66:
 			// LOAD H, (HL)
 
 			opcd_ld_h_hl();
+			t_cycles += 4;
 			break;
 
 		case 0x67:
@@ -842,42 +945,49 @@ void execute(){
 			// Put the contents of A into the H register
 
 			opcd_ld_h_a();
+			t_cycles += 4;
 			break;
 
 		case 0x68:
 			// LD L, B
 
 			opcd_ld_l_b();
+			t_cycles += 4;
 			break;
 
 		case 0x69:
 			// LD L, C
 
 			opcd_ld_l_c();
+			t_cycles += 4;
 			break;
 
 		case 0x6a:
 			// LD L, D
 
 			opcd_ld_l_d();
+			t_cycles += 4;
 			break;
 
 		case 0x6b:
 			// LD L, E
 
 			opcd_ld_l_e();
+			t_cycles += 4;
 			break;
 
 		case 0x6c:
 			// LD L, H
 
 			opcd_ld_l_h();
+			t_cycles += 4;
 			break;
 
 		case 0x6d:
 			// LD L, L
 
 			opcd_ld_l_l();
+			t_cycles += 4;
 			break;
 
 
@@ -886,6 +996,7 @@ void execute(){
 			// Put values at mem address HL into L
 
 			opcd_ld_l_hl();
+			t_cycles += 8;
 			break;
 
 		case 0x6f:
@@ -894,6 +1005,7 @@ void execute(){
 			// Put the contents of A into the L register
 
 			opcd_ld_l_a();
+			t_cycles += 4;
 			break;
 
 		case 0x70:
@@ -902,6 +1014,7 @@ void execute(){
 			// put data of B into memory of HL
 
 			opcd_ld_hl_b();
+			t_cycles += 8;
 			break;
 
 		case 0x71:
@@ -910,6 +1023,7 @@ void execute(){
 			// put data of C into memory of HL
 
 			opcd_ld_hl_c();
+			t_cycles += 8;
 			break;
 
 		case 0x72:
@@ -918,6 +1032,7 @@ void execute(){
 			// put data of D into memory of HL
 
 			opcd_ld_hl_d();
+			t_cycles += 8;
 			break;
 
 		case 0x73:
@@ -926,23 +1041,27 @@ void execute(){
 			// put data of E into the memory of HL
 
 			opcd_ld_hl_e();
+			t_cycles += 8;
 			break;
 
 		case 0x74:
 			// LD (HL), H
 
 			opcd_ld_hl_h();
+			t_cycles += 8;
 			break;
 
 		case 0x75:
 			// LD (HL), L
 
 			opcd_ld_hl_l();
+			t_cycles += 8;
 			break;
 
 		case 0x76:
 			// TODO
 
+			//exit(1);
 			break;
 
 		case 0x77:
@@ -951,6 +1070,7 @@ void execute(){
 			// put data of A into memory of HL
 
 			opcd_ld_hl_a();
+			t_cycles += 8;
 			break;
 
 		case 0x78:
@@ -959,13 +1079,16 @@ void execute(){
 			// Put contents of B into A
 
 			opcd_ld_a_b();
+			t_cycles += 4;
 			break;
 
 		case 0x79:
 			// LOAD A,C
 			// lenght is 1 byte
 			// Put contents of C into A
+
 			opcd_ld_a_c();
+			t_cycles += 4;
 			break;
 
 		case 0x7a:
@@ -974,6 +1097,7 @@ void execute(){
 			// Put contents of D into A
 
 			opcd_ld_a_d();
+			t_cycles += 4;
 			break;
 
 		case 0x7b:
@@ -982,6 +1106,7 @@ void execute(){
 			// Put contents of E into A
 
 			opcd_ld_a_e();
+			t_cycles += 4;
 			break;
 
 		case 0x7c:
@@ -990,6 +1115,7 @@ void execute(){
 			// Put contents of H into A
 
 			opcd_ld_a_h();
+			t_cycles += 4;
 			break;
 
 		case 0x7d:
@@ -998,6 +1124,7 @@ void execute(){
 			// Put contents of L into A
 
 			opcd_ld_a_l();
+			t_cycles += 4;
 			break;
 
 		case 0x7e:
@@ -1006,12 +1133,14 @@ void execute(){
 			// Put contents at (HL) into A
 
 			opcd_ld_a_hl();
+			t_cycles += 8;
 			break;
 
 		case 0x7f:
 			// LD A,A
 
 			opcd_ld_a_a();
+			t_cycles += 4;
 			break;
 
 		case 0x80:
@@ -1020,6 +1149,7 @@ void execute(){
 			// Add B to A and store in A
 
 			opcd_add_a_b();
+			t_cycles += 4;
 			break;
 
 		case 0x81:
@@ -1028,30 +1158,35 @@ void execute(){
 			// Add C to A and store in A
 
 			opcd_add_a_c();
+			t_cycles += 4;
 			break;
 
 		case 0x82:
 			// ADD A, D
 
 			opcd_add_a_d();
+			t_cycles += 4;
 			break;
 
 		case 0x83:
 			// ADD A, E
 
 			opcd_add_a_e();
+			t_cycles += 4;
 			break;
 
 		case 0x84:
 			// ADD A, H
 
 			opcd_add_a_h();
+			t_cycles += 4;
 			break;
 
 		case 0x85:
 			// ADD A, L
 
 			opcd_add_a_l();
+			t_cycles += 4;
 			break;
 
 
@@ -1062,6 +1197,7 @@ void execute(){
 			// and store in A
 
 			opcd_add_a_hl();
+			t_cycles += 8;
 			break;
 
 		case 0x87:
@@ -1070,54 +1206,63 @@ void execute(){
 			// Add A to A and store in A
 
 			opcd_add_a_a();
+			t_cycles += 4;
 			break;
 
 		case 0x88:
 			// ADC A,B
 
 			opcd_adc_a_b();
+			t_cycles += 4;
 			break;
 
 		case 0x89:
 			// ADC A,C
 
 			opcd_adc_a_c();
+			t_cycles += 4;
 			break;
 
 		case 0x8a:
 			// ADC A,D
 
 			opcd_adc_a_d();
+			t_cycles += 4;
 			break;
 
 		case 0x8b:
 			// ADC A,E
 
 			opcd_adc_a_e();
+			t_cycles += 4;
 			break;
 
 		case 0x8c:
 			// ADC A,H
 
 			opcd_adc_a_h();
+			t_cycles += 4;
 			break;
 
 		case 0x8d:
 			// ADC A,L
 
 			opcd_adc_a_l();
+			t_cycles += 4;
 			break;
 
 		case 0x8e:
 			// ADC A,(HL)
 
 			opcd_adc_a_hl();
+			t_cycles += 8;
 			break;
 
 		case 0x8f:
 			// ADC A. A
 
 			opcd_adc_a_a();
+			t_cycles += 4;
 			break;
 
 		case 0x90:
@@ -1126,6 +1271,7 @@ void execute(){
 			// subtract B from A
 
 			opcd_sub_a_b();
+			t_cycles += 4;
 			break;
 
 		case 0x91:
@@ -1134,144 +1280,168 @@ void execute(){
 			// subtract C from A
 
 			opcd_sub_a_c();
+			t_cycles += 4;
 			break;
 
 		case 0x92:
 			// SUB D
 
 			opcd_sub_a_d();
+			t_cycles += 4;
 			break;
 
 		case 0x93:
 			// SUB E
 
 			opcd_sub_a_e();
+			t_cycles += 4;
 			break;
 
 		case 0x94:
 			// SUB H
 
 			opcd_sub_a_h();
+			t_cycles += 4;
 			break;
 
 		case 0x95:
 			// SUB L
 
 			opcd_sub_a_l();
+			t_cycles += 4;
 			break;
 
 		case 0x96:
 			// SUB (HL)
 
 			opcd_sub_a_hl();
+			t_cycles += 8;
 			break;
 
 		case 0x97:
 			// SUB A
 
 			opcd_sub_a_a();
+			t_cycles += 4;
 			break;
 
 		case 0x98:
 			// SBC A, B
 
 			opcd_sbc_a_b();
+			t_cycles += 4;
 			break;
 
 		case 0x99:
 			// SBC A, C
 
 			opcd_sbc_a_c();
+			t_cycles += 4;
 			break;
 
 		case 0x9a:
 			// SBC A, D
 
 			opcd_sbc_a_d();
+			t_cycles += 4;
 			break;
 
 		case 0x9b:
 			// SBC A, E
 
 			opcd_sbc_a_e();
+			t_cycles += 4;
 			break;
 
 		case 0x9c:
 			// SBC A, H
 
 			opcd_sbc_a_h();
+			t_cycles += 4;
 			break;
 
 		case 0x9d:
 			// SBC A, L
 
 			opcd_sbc_a_l();
+			t_cycles += 4;
 			break;
 
 		case 0x9e:
 			// SBC A , (HL)
 
 			opcd_sbc_a_hl();
+			t_cycles += 8;
 			break;
 
 		case 0x9f:
 			// SBC A, A
 
 			opcd_sbc_a_a();
+			t_cycles += 4;
 			break;
 
 		case 0xa0:
 			// AND B
 
 			opcd_and_b();
+			t_cycles += 4;
 			break;
 
 		case 0xa1:
 			// AND C
 
 			opcd_and_c();
+			t_cycles += 4;
 			break;
 
 		case 0xa2:
 			// AND D
 
 			opcd_and_d();
+			t_cycles += 4;
 			break;
 
 		case 0xa3:
 			// AND E
 
 			opcd_and_e();
+			t_cycles += 4;
 			break;
 
 		case 0xa4:
 			// AND H
 
 			opcd_and_h();
+			t_cycles += 4;
 			break;
 
 		case 0xa5:
 			// AND L
 
 			opcd_and_l();
+			t_cycles += 4;
 			break;
 
 		case 0xa6:
 			// AND (HL)
 
 			opcd_and_hl();
+			t_cycles += 8;
 			break;
 
 		case 0xa7:
 			// AND A
 
 			opcd_and_a();
+			t_cycles += 4;
 			break;
 
 		case 0xa8:
 			// XOR B
 
 			opcd_xor_b();
+			t_cycles += 4;
 			break;
 
 		case 0xa9:
@@ -1281,24 +1451,28 @@ void execute(){
 			// XOR's the value which is in A with A and stores in A
 
 			opcd_xor_c();
+			t_cycles += 4;
 			break;
 
 		case 0xaa:
 			// XOR D
 
 			opcd_xor_d();
+			t_cycles += 4;
 			break;
 
 		case 0xab:
 			// XOR E
 
 			opcd_xor_e();
+			t_cycles += 4;
 			break;
 
 		case 0xac:
 			// XOR H
 
 			opcd_xor_h();
+			t_cycles += 4;
 			break;
 
 		case 0xad:
@@ -1308,6 +1482,7 @@ void execute(){
 			// XOR's the value which is in L with A and stores in A
 
 			opcd_xor_l();
+			t_cycles += 4;
 			break;
 
 		case 0xae:
@@ -1317,6 +1492,7 @@ void execute(){
 			// XOR's the value which is in A with value at HL and stores in A
 
 			opcd_xor_memhl();
+			t_cycles += 8;
 			break;
 
 		case 0xaf:
@@ -1326,6 +1502,7 @@ void execute(){
 			// XOR's the value which is in A with A and stores in A
 
 			opcd_xor_a();
+			t_cycles += 4;
 			break;
 
 		case 0xb0:
@@ -1335,6 +1512,7 @@ void execute(){
 			// OR's the value which is in B with A and stores in A
 
 			opcd_or_b();
+			t_cycles += 4;
 			break;
 
 		case 0xb1:
@@ -1344,29 +1522,35 @@ void execute(){
 			// OR's the value which is in C with A and stores in A
 
 			opcd_or_c();
+			t_cycles += 4;
 			break;
+
 		case 0xb2:
 			// OR D
 
 			opcd_or_d();
+			t_cycles += 4;
 			break;
 
 		case 0xb3:
 			// OR E
 
 			opcd_or_e();
+			t_cycles += 4;
 			break;
 
 		case 0xb4:
 			// OR H
 
 			opcd_or_h();
+			t_cycles += 4;
 			break;
 
 		case 0xb5:
 			// OR L
 
 			opcd_or_l();
+			t_cycles += 4;
 			break;
 
 		case 0xb6:
@@ -1376,6 +1560,7 @@ void execute(){
 			// OR's the value which is at memory address HL with A and stores in A
 
 			opcd_or_hl();
+			t_cycles += 8;
 			break;
 
 		case 0xb7:
@@ -1385,12 +1570,14 @@ void execute(){
 			// OR's the value which is in A with A and stores in A
 
 			opcd_or_a();
+			t_cycles += 4;
 			break;
 
 		case 0xb8:
 			// CP B
 
 			opcd_cp_b();
+			t_cycles += 4;
 			break;
 
 		case 0xb9:
@@ -1398,30 +1585,35 @@ void execute(){
 			// Calculate A - C and set Z flag
 
 			opcd_cp_c();
+			t_cycles += 4;
 			break;
 
 		case 0xba:
 			// CP D
 
 			opcd_cp_d();
+			t_cycles += 4;
 			break;
 
 		case 0xbb:
 			// CP E
 
 			opcd_cp_e();
+			t_cycles += 4;
 			break;
 
 		case 0xbc:
 			// CP H
 
 			opcd_cp_h();
+			t_cycles += 4;
 			break;
 
 		case 0xbd:
 			// CP L
 
 			opcd_cp_l();
+			t_cycles += 4;
 			break;
 
 		case 0xbe:
@@ -1434,12 +1626,14 @@ void execute(){
 			// Z = 1
 
 			opcd_cp_a_hl();
+			t_cycles += 8;
 			break;
 
 		case 0xbf:
 			// CP A
 
 			opcd_cp_a();
+			t_cycles += 4;
 			break;
 
 		case 0xc0:
@@ -1447,6 +1641,11 @@ void execute(){
 			// if Z flag 0 then ret
 
 			opcd_ret_nz();
+
+			if(getz() == 0)
+				t_cycles += 20;
+			else
+				t_cycles += 8;
 			break;
 
 		case 0xc1:
@@ -1454,12 +1653,17 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_pop_bc();
+			t_cycles += 12;
 			break;
 
 		case 0xc2:
 			//JP NZ, u16
 
 			opcd_jp_nz_u16();
+			if(getz() == 0)
+				t_cycles += 16;
+			else
+				t_cycles += 12;
 			break;
 
 		case 0xc3:
@@ -1468,6 +1672,7 @@ void execute(){
 			// lenght is 3 bytes
 
 			opcd_jp_u16();
+			t_cycles += 16;
 			break;
 
 		case 0xc4:
@@ -1475,6 +1680,11 @@ void execute(){
 			// lenght is 3 bytes
 
 			opcd_call_nz_u16();
+
+			if(getz() == 0)
+				t_cycles += 24;
+			else
+				t_cycles += 12;
 			break;
 
 
@@ -1485,6 +1695,7 @@ void execute(){
 			// and decrements the SP twice
 
 			opcd_push_bc();
+			t_cycles += 16;
 			break;
 
 		case 0xc6:
@@ -1493,12 +1704,14 @@ void execute(){
 			// Add u8 to A and store in A
 
 			opcd_add_a_u8();
+			t_cycles += 8;
 			break;
 
 		case 0xc7:
 			// RST 0
 
 			opcd_rst_0();
+			t_cycles += 16;
 			break;
 
 		case 0xc8:
@@ -1506,6 +1719,11 @@ void execute(){
 			// Ret only if Z is 1
 
 			opcd_ret_z();
+
+			if(getz() == 1)
+				t_cycles += 20;
+			else
+				t_cycles += 8;
 			break;
 
 		case 0xc9:
@@ -1514,12 +1732,18 @@ void execute(){
 			// POP the stack and put it into the PC
 
 			opcd_ret();
+			t_cycles += 16;
 			break;
 
 		case 0xca:
 			//JP Z, u16
 
 			opcd_jp_z_u16();
+
+			if(getz() == 1)
+				t_cycles += 16;
+			else
+				t_cycles += 12;
 			break;
 
 		case 0xcb:
@@ -1540,6 +1764,10 @@ void execute(){
 			// CALL Z , u16
 
 			opcd_call_z_u16();
+			if(getz() == 1)
+				t_cycles += 24;
+			else
+				t_cycles += 12;
 			break;
 
 		case 0xcd:
@@ -1547,6 +1775,7 @@ void execute(){
 			// lenght is 3 bytes
 
 			opcd_call_u16();
+			t_cycles += 24;
 			//sleep(5);
 			break;
 
@@ -1556,12 +1785,14 @@ void execute(){
 			// Set Z flags, N = 0, H and C
 
 			opcd_adc_a_u8();
+			t_cycles += 8;
 			break;
 
 		case 0xcf:
 			// RST 1
 
 			opcd_rst_1();
+			t_cycles += 16;
 			break;
 
 		case 0xd0:
@@ -1570,6 +1801,11 @@ void execute(){
 			// POP the stack and put it into the PC if C flag is 0
 
 			opcd_ret_nc();
+
+			if(getC() == 0)
+				t_cycles += 20;
+			else
+				t_cycles += 8;
 			break;
 
 		case 0xd1:
@@ -1577,18 +1813,28 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_pop_de();
+			t_cycles += 12;
 			break;
 
 		case 0xd2:
 			// JP NC, u16
 
 			opcd_jp_nc_u16();
+
+			if(getC() == 0)
+				t_cycles += 16;
+			else
+				t_cycles += 12;
 			break;
 
 		case 0xd4:
 			// CALL NC , u16
 
 			opcd_call_nc_u16();
+			if(getC() == 0)
+				t_cycles += 24;
+			else
+				t_cycles += 12;
 			break;
 
 		case 0xd5:
@@ -1598,6 +1844,7 @@ void execute(){
 			// and decrements the SP twice
 
 			opcd_push_de();
+			t_cycles += 16;
 			break;
 
 		case 0xd6:
@@ -1606,12 +1853,14 @@ void execute(){
 			// subtract u8 from A
 
 			opcd_sub_u8();
+			t_cycles += 8;
 			break;
 
 		case 0xd7:
 			// RST 2
 
 			opcd_rst_2();
+			t_cycles += 16;
 			break;
 
 		case 0xd8:
@@ -1619,25 +1868,39 @@ void execute(){
 			// POP the stack and put
 			// it in the PC if C is 1
 			opcd_ret_c();
+			if(getC() == 1)
+				t_cycles += 20;
+			else
+				t_cycles += 8;
 			break;
 
 		case 0xd9:
 			// RETI
 			// TODO
 
-			opcd_reti();
+			cpu.IME = 1;
+			opcd_ret();
+			t_cycles += 16;
 			break;
 
 		case 0xda:
 			// JP C, u16
 
 			opcd_jp_c_u16();
+			if(getC() == 1)
+				t_cycles += 16;
+			else
+				t_cycles += 12;
 			break;
 
 		case 0xdc:
 			// CALL C, u16
 
 			opcd_call_c_u16();
+			if(getC() == 1)
+				t_cycles += 24;
+			else
+				t_cycles += 12;
 			break;
 
 		case 0xde:
@@ -1649,12 +1912,14 @@ void execute(){
 			// H , C = set
 
 			opcd_sbc_a_u8();
+			t_cycles += 8;
 			break;
 
 		case 0xdf:
 			// RST 3
 
 			opcd_rst_3();
+			t_cycles += 16;
 			break;
 
 		case 0xe0:
@@ -1663,6 +1928,7 @@ void execute(){
 			// Put A into addr of val u8+ 0xff00
 
 			opcd_ld_ff00_u8_a();
+			t_cycles += 12;
 
 			break;
 
@@ -1674,6 +1940,7 @@ void execute(){
 				//exit(1);
 
 			opcd_pop_hl();
+			t_cycles += 12;
 			break;
 
 		case 0xe2:
@@ -1682,6 +1949,7 @@ void execute(){
 			// Put A into addr of val at C + 0xff00
 
 			opcd_ld_ff00_c_a();
+			t_cycles += 8;
 
 			break;
 
@@ -1692,6 +1960,7 @@ void execute(){
 			// and decrements the SP twice
 
 			opcd_push_hl();
+			t_cycles += 16;
 			break;
 
 		case 0xe6:
@@ -1700,12 +1969,15 @@ void execute(){
 			// AND u8 with A and store it in A
 
 			opcd_and_u8();
+			t_cycles += 8;
+
 			break;
 
 		case 0xe7:
 			// RST 4
 
 			opcd_rst_4();
+			t_cycles += 16;
 			break;
 
 		case 0xe8:
@@ -1713,6 +1985,7 @@ void execute(){
 			// add u8 into SP
 
 			opcd_add_sp_u8();
+			t_cycles += 16;
 			break;
 
 		case 0xe9:
@@ -1721,6 +1994,8 @@ void execute(){
 			// lenght is 3 bytes
 
 			opcd_jp_hl();
+			t_cycles += 4;
+
 			break;
 
 		case 0xea:
@@ -1729,6 +2004,7 @@ void execute(){
 			// store the value of A at memory address u16
 
 			opcd_ld_u16_a();
+			t_cycles += 16;
 
 			break;
 
@@ -1749,12 +2025,15 @@ void execute(){
 
 			dprintf("Value of register A after : 0b%08b\n",cpu.A);
 
+			t_cycles += 8;
+
 			break;
 
 		case 0xef:
 			// RST 5
 
 			opcd_rst_5();
+			t_cycles += 16;
 			break;
 
 		case 0xf0:
@@ -1763,6 +2042,7 @@ void execute(){
 			// put the values from the memory addr (0xff00 + u8) into A
 
 			opcd_ld_a_ff00_u8();
+			t_cycles += 12;
 
 			break;
 
@@ -1771,6 +2051,7 @@ void execute(){
 			// lenght is 1 byte
 
 			opcd_pop_af();
+			t_cycles += 12;
 
 			break;
 
@@ -1784,12 +2065,18 @@ void execute(){
 			// or mode register at the address in the range
 
 			opcd_ld_a_c_ff00();
+			t_cycles += 8;
 			break;
 
 		case 0xf3:
 			// DI
 			// 1 byte long
-			dprintf("DI (need to implement interrupts)\n");
+
+			dprintf("DI\n");
+
+			cpu.IME = 0;
+
+			t_cycles += 4;
 			break;
 
 		case 0xf5:
@@ -1799,6 +2086,7 @@ void execute(){
 			// and decrements the SP twice
 
 			opcd_push_af();
+			t_cycles += 16;
 			break;
 
 		case 0xf6:
@@ -1806,18 +2094,21 @@ void execute(){
 			// OR u8 with A and store in A
 
 			opcd_or_u8();
+			t_cycles += 8;
 			break;
 
 		case 0xf7:
 			// RST 6
 
 			opcd_rst_6();
+			t_cycles += 16;
 			break;
 
 		case 0xf8:
 			// LD HL, SP + u8
 
 			opcd_ld_hl_sp_u8();
+			t_cycles += 12;
 			break;
 
 		case 0xf9:
@@ -1825,6 +2116,7 @@ void execute(){
 			// Put HL in SP
 
 			opcd_ld_sp_hl();
+			t_cycles += 8;
 			break;
 
 		case 0xfa:
@@ -1834,11 +2126,16 @@ void execute(){
 			// into register A
 
 			opcd_ld_a_u16();
+			t_cycles += 16;
 			break;
 
 		case 0xfb:
 			// EI
 			// TODO
+
+			dprintf("EI\n");
+			cpu.IME = 1;
+			t_cycles += 4;
 
 			break;
 
@@ -1871,6 +2168,7 @@ void execute(){
 			setc(cpu.A < u8);
 
 			//sleep(1);
+			t_cycles += 8;
 
 			break;
 
@@ -1878,6 +2176,7 @@ void execute(){
 			// RST 7
 
 			opcd_rst_7();
+			t_cycles += 16;
 			break;
 
 		default:
@@ -1909,5 +2208,8 @@ void execute(){
 
 	dprintf("\nRegister PC after: 0x%04x\n",cpu.PC);
 
+
 	logmsg("execute",false);
+
+	return t_cycles;
 }

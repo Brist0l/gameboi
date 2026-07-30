@@ -21,6 +21,14 @@ like with cpu_ld
 --NEW--
 => write the docs of draw
 => implement colour in rendering
+--DONE--
+=> Complete writing the cycle data for each instruction
+=> implement the interrupts (need to do)
+--DONE--
+=> Complete the game_init_sdl()
+=> Complete the background debug
+--DONE--
+=> Check why isn't window not working in DMG_acid2 test
 
 
 
@@ -29,4 +37,7 @@ like with cpu_ld
 
 =====NEED TO DO========
 => Take in runtime arguments (need to do) (done) 
-=> make a function showstack() (need to do) 
+=> make a function showstack() (need to do)  (done) 
+=> Make a config file which stores the ROM you want to
+load with debug flags and other flags with serial IO
+file location

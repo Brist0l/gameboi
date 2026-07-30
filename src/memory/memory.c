@@ -1,5 +1,6 @@
 #include<stdint.h>
 #include<unistd.h>
+#include<stdlib.h>
 
 #include "cpu.h"
 #include "debug.h"
@@ -25,7 +26,6 @@ FF00h – FF7Fh 	I/O 	Registers I/O registers are mapped here.
 FF80h – FFFEh 	HRAM 	Internal CPU RAM
 FFFFh 		IE 	Register Interrupt enable flags.
 */
-
 
 /*
 
@@ -70,7 +70,18 @@ uint8_t pop(){
 	return memory[cpu.SP++];
 }
 
+void serial_io(char s){
+	FILE* f = fopen("logs/serial/serialio2","a");
+
+	if(f != NULL){
+		fputc(s,f);
+		fclose(f);
+	}
+}
+
 void memory_write(uint16_t mem_addr,uint8_t val){
+
+	// Serial transfer data is 0xff01
 	if(mem_addr == 0xff01){
         	serial_data = val;
 	}
@@ -85,31 +96,12 @@ void memory_write(uint16_t mem_addr,uint8_t val){
 		serial_io(serial_data);
 	}
 
-	if(mem_addr == 0xdef6 && val == 0x0f){
-	    //printf("READ %04x\n",mem_addr);
-            //memory[0xdef6] = 0x87; //  Just to pass the infinite loop
-	    //exit(1);
-	    _memorydump(0xdef0,0xdef6);
-	    dprintf("===========================================+++++++++++++++++++++++++++++++++++================================\n");
-	}
+	//if(mem_addr == 0xff0f)
+		//sleep(3);
 
-	if(mem_addr == 0xdf7e && val == 0x9b){
-	    //printf("READ %04x\n",mem_addr);
-            //memory[0xdef6] = 0x87; //  Just to pass the infinite loop
-	    //exit(1);
-	    dprintf("find_this\n");
-	}
+	//if(mem_addr == 0xff40)
+		//sleep(3);
 
-	if(mem_addr == 0xc704 && val == 0x0f){
-	    //printf("READ %04x\n",mem_addr);
-            //memory[0xdef6] = 0x87; //  Just to pass the infinite loop
-	    _memorydump(0x4700,0x470f);
-	    dprintf("===========================================+++++++++++++++++++++++++++++++++++================================\n");
-	    //exit(1);
-	}
-
-	//if(mem_addr >= 0x9900 && mem_addr <= 0x9940)
-	    //printf("WRITE 0x%04x = 0x%02x\n",mem_addr,val);
 
 	memory[mem_addr] = val;
 }

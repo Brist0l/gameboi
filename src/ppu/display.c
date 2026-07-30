@@ -6,16 +6,15 @@
 #include "debug.h"
 #include "display.h"
 
-
-
-bool game_init_sdl(struct Game *g){
-	//printf("%d\n",SDL_FLAGS);
+bool game_init_sdl(struct Game *g,const char* title,int width,int height,int scale){
+	dprintf("%d\n",SDL_FLAGS);
+	
 	if(!SDL_Init(SDL_FLAGS)){ // Inits the SDL system as a whole
 		dprintf("Error initialising SDL3: %s\n",SDL_GetError());
 		return false;
 	}
 
-	g->window = SDL_CreateWindow(WINDOW_TITLE,WINDOW_WIDTH * SCALE,WINDOW_HEIGHT * SCALE,0);
+	g->window = SDL_CreateWindow(title,width * scale,height * scale,0);
 
 	if(!g->window){
 		dprintf("Error Creating window: %s\n",SDL_GetError());
@@ -32,7 +31,7 @@ bool game_init_sdl(struct Game *g){
 	return true;
 }
 
-bool game_new(struct Game **game){
+bool game_new(struct Game **game,const char* title,int width,int height,int scale){
 	*game = calloc(1,sizeof(struct Game));
 
 
@@ -44,7 +43,7 @@ bool game_new(struct Game **game){
 
 	struct Game *g = *game; //Just to not modify the code beneath this
 
-	if(!game_init_sdl(g)){
+	if(!game_init_sdl(g,title,width,height,scale)){
 		dprintf("Failed to init SDL: %s\n",SDL_GetError());
 		return false;
 	}

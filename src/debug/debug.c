@@ -159,9 +159,4 @@ void other_log(){
 		);
 }
 
-void serial_io(char s){
-	FILE* f = fopen("logs/serial/serialio2","a");
-	fputc(s,f);
-	fclose(f);
-}
 

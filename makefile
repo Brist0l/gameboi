@@ -3,7 +3,7 @@
 
 sources := $(shell find src -name '*.c')
 
-run_sources := $(filter-out src/ppu_debug.c,$(sources))
+run_sources := $(filter-out src/ppu/ppu_debug.c,$(sources))
 debug_sources := $(filter-out src/main.c,$(sources))
 
 OBJDIR := build/obj

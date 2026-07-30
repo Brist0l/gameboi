@@ -1,0 +1,178 @@
+Design as per 20/7/26:
+---------------------
+
+The "while" loop runs based on two variables, i.e. g->is_running and "runned".
+
+g -> is_running : it's the state of the SDL window.
+runned : it's the state of the SDL window of whether it has been run or not. (initialised to false)
+
+	while(runned == false || g->is_running){
+
+So it will just start this while loop. After that it checks for game_events but rn g is NULL.
+Then it executes the instructions , in my design I have added the fetch phase inside of the
+execute() function only.
+
+An instruction is executed and after that I check the LCDC.7 register to see if I have been
+asked to switch on the LCD, if that is the case then I make a new window and set runned to
+true because now I hand the control to the SDL window , so now g-> is_running is the boss
+and it controls the while loop. In this "if" block I also check if runned is true or not so
+that I don't make multiple instances of the SDL window on the same buffer.
+
+Then I check if "g" isn't NULL and if it's not NULL then I start drawing and rendering it.
+
+Now in the draw() function it first calls the "set_background()" function.
+
+set_background():
+----------------
+
+Now first off this function calls "select_background()", this function is basically the
+checking of LCDC.3 register. It sets the bacground address to 0x9800 or 0x9c00 depending
+on LCDC.3 register. It also returns the end address of the tile map.
+Now I loop over that tile map and over there I choose the addressing mode (via the
+select_addressing_mode() function) and according to that I calculate the _tile's starting
+address_.
+I increment the background_mem address , which holds the tile index. Now I read 16 bytes starting
+from the "start_address" and store it in a buffer and I pass that buffer into my "make_tile()"
+function which makes the static data into a tile.
+The first index is of the tile at the top left (refer to docs/ppu.txt for more info) , so
+after creating that tile I set the "background" using this tile.
+
+		// Set the background as the tile
+		for(int y = 0; y < 8;y++){
+			for(int x = 0; x < 8;x++){
+				background[background_y + y][background_x + x] = tile[y][x];
+				dprintf("d_y : %d\nd_x: %d\n",d_y,d_x);
+			}
+
+		}
+
+		background_x += 8;
+
+		if(background_x == 256){
+			dprintf("Setting background_x to 0!!!\n");
+			background_x = 0;
+			background_y += 8;
+
+		}
+
+
+		if(background_y >= 256){
+			dprintf("Setting background_y to 0!!!\n");
+			background_y = 0;
+		}
+
+Note that background_y and bacground_x is both 0 at the start. So basically I go like 
+
+		Background: 
+			
+			Y 	X
+			---------
+			0	0 	^		^
+			0	1	|		|
+			0	2	|		|
+			.	.  Inner loop of    	| 
+			.	.  "x" is complete      |
+			.	.	|		|
+			.	.	|		|
+			0	7	V		|
+			1	0 	^		|
+			1	1	|	   "y" completed
+			1	2	|		|
+			.	.  Inner loop of	|
+			.	.  "x" is complete	|
+			.	.	|		|
+			.	.	|		|
+			1	7	V		|
+			.	.			|
+			.	.			|
+			.	.			|
+			7	7			V
+
+
+
+So in the bacground frame what I have essentially done is, 
+			
+			<---7--->
+
+			<---------------------256----------------------->
+			-------------------------------------------------
+	^	^	|		|				|
+	|	|	|     Tile 	|				|
+	|	|	|      0	|				|
+	|       7	|		|				|
+	|	|	|		|				|
+	|	|	|		|				|
+	256	V	|---------------|				|
+	|		|						|
+        |		|						|
+	|		|						|
+	|		|						|
+	|		|						|
+	|		|						|
+	|		|						|
+	|		|						|
+	V		-------------------------------------------------
+
+
+That means both the loops have ended once the tile has been placed in the 
+background map. 
+After that "background_x" is incremented by 8.So Now that means I will still
+be on the first row but I have moved collums, So Now I will be writing 
+
+		Background: 
+			
+			Y 	X
+			---------
+			0	8 	^		^
+			0	9	|		|
+			0	10	|		|
+			.	.  Inner loop of    	| 
+			.	.  "x" is complete      |
+			.	.	|		|
+			.	.	|		|
+			0	15	V		|
+			1	8 	^		|
+			1	9	|	   "y" completed
+			1	10	|		|
+			.	.  Inner loop of	|
+			.	.  "x" is complete	|
+			.	.	|		|
+			.	.	|		|
+			1	15	V		|
+			.	.			|
+			.	.			|
+			.	.			|
+			7	15			V
+
+Now I will have the tile-1 also in place.
+
+		if(background_x == 256){
+			dprintf("Setting background_x to 0!!!\n");
+			background_x = 0;
+			background_y += 8;
+
+		}
+
+Now this just moves me to the next row of the tile and starts at the 
+first columb
+
+		if(background_y >= 256){
+			dprintf("Setting background_y to 0!!!\n");
+			background_y = 0;
+		}
+This just ensures that I dont write beyond the array.
+
+Now after all of this a background_to_display() function is called.
+This basically sets the viewport on the main array which is being 
+displayed on the SDL window.
+
+First and foremost I get the values of SCX and SCY
+
+	for(int y = 0; y < WINDOW_HEIGHT; y++)
+		for(int x = 0; x < WINDOW_WIDTH; x++)
+			display[y][x] = background[(scy + y) % 256][(scx + x) % 256];
+
+With the "%" I am able to wrap around the bacground along the viewport.
+
+Now I am again back at "ppu.c" wherein I check LCDC.5 and then according to that I render 
+a window. (TODO: check bug whehter window renders or not)

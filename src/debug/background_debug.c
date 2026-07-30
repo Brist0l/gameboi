@@ -1,74 +1,19 @@
 #include "display.h"
-#include "registers_ppu.h"
 #include "debug.h"
 #include "ppu.h"
 #include "memory.h"
 #include "tile.h"
+#include "ppu.h"
+#include "debug.h"
 #include "display.h"
+#include "memory.h"
+#include "background.h"
 
 static uint16_t background_mem = 0x9800;
 static uint16_t background_mem_end;
+uint8_t debug_background[256][256] = {0};
 
-void show_background(){
-	for(int y = 0; y < 256;y++){
-		for(int x = 0; x < 256;x++){
-			dprintf("%02b ",background[y][x]);
-		}
-		dprintf("\n");
-	}
-}
-
-
-
-void background_to_display(){
-	logmsg("background_to_display",true);
-
-	int scy = getSCY(); // Top
-	int scx = getSCX(); // Left
-
-	// This is a redundant test cuz it will
-	// always be below 255 as it's a 8 bit
-	// register
-	//
-	//if(scx >= 256)		scx %= 256;
-	//
-	//if(scy >= 256)
-	//	scy %= 256;
-
-	dprintf("SCX : %d\nSCY : %d\n",scx,scy);
-	//exit(1);
-
-	for(int y = 0; y < WINDOW_HEIGHT; y++){
-		for(int x = 0; x < WINDOW_WIDTH; x++){
-			display[y][x] = background[(scy + y) % 256][(scx + x) % 256];
-			//dprintf("%d ",background[((scy) + y) % 256][(scx +x) % 256]);
-			//if(x % 64 == 0)
-				//dprintf("\n");
-		}
-	}
-		
-	dprintf("\n");
-	logmsg("background_to_display",false);
-
-}
-
-uint16_t select_background(){
-	// This will select the background map depending
-	// on the LCDC bit
-	//
-	// Returns the ending address of the background.
-	if(LCDC_bg_tile_map_select_3() == 0){
-		background_mem = 0x9800;
-		return 0x9bff;
-	}
-	else{
-		background_mem = 0x9c00;
-		return 0x9fff;
-	}
-
-}
-
-void set_background(){
+void set_debug_background(){
 	uint8_t data[16];
 	int background_y = 0;
 	int background_x = 0;
@@ -104,7 +49,7 @@ void set_background(){
 		// Set the background as the tile
 		for(int y = 0; y < 8;y++){
 			for(int x = 0; x < 8;x++){
-				background[background_y + y][background_x + x] = tile[y][x];
+				debug_background[background_y + y][background_x + x] = tile[y][x];
 				//dprintf("d_y : %d\nd_x: %d\n",d_y,d_x);
 			}
 
@@ -129,3 +74,30 @@ void set_background(){
 
 }
 
+SDL_Color _dmg_palette[4] = {
+    {155, 188, 15, 255},
+    {48, 98, 48, 255},
+    {139, 172, 15, 255},
+    {15, 56, 15, 255}
+};
+
+void debug_render_screen(struct Game *g){
+    	SDL_SetRenderDrawColor(g->renderer, _dmg_palette[3].r, _dmg_palette[3].g,_dmg_palette[3].b,_dmg_palette[3].a);
+    	SDL_RenderClear(g->renderer);
+
+  	for(int y = 0; y < 256; y++) {
+        	for(int x = 0; x < 256; x++) {
+			
+			SDL_Color c = _dmg_palette[debug_background[y][x] & 0b11];
+
+			if(debug_background[y][x] != 0)
+				dprintf("Display colour : %d\nPainting colour : %d\n",debug_background[y][x],debug_background[y][x] & 0b11);
+			SDL_SetRenderDrawColor(g->renderer,c.r,c.g,c.b,c.a);
+
+                	SDL_FRect rect = {x * BACKGROUND_SCALE, y * BACKGROUND_SCALE, BACKGROUND_SCALE, BACKGROUND_SCALE};
+                	SDL_RenderFillRect(g->renderer, &rect);
+        	}
+    	}
+
+    	SDL_RenderPresent(g->renderer); // update the rendering content
+}

@@ -1,0 +1,4 @@
+=> Instructions like `CP` and `ADC` make sense now after implementing
+the t_cycles. `CP` can do the same things in lesser cycles , if I wrote
+3-4 instructions to do this CP thing then I would use more of these 
+cycles.
