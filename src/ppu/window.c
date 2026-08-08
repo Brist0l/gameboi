@@ -1,5 +1,3 @@
-#include <stdlib.h>
-
 #include "display.h"
 #include "registers_ppu.h"
 #include "debug.h"
@@ -7,7 +5,7 @@
 #include "memory.h"
 #include "tile.h"
 
-static uint16_t window_mem = 0x9800;
+static uint16_t window_mem;
 static uint16_t window_mem_end;
 static int d_x = 0;
 static int d_y = 0;
@@ -36,14 +34,15 @@ void window_to_display(){
 	//	wy %= 256;
 
 	dprintf("WX : %d\nWY : %d\n",wx,wy);
-	exit(1);
 
 	for(int y = 0; y < WINDOW_HEIGHT; y++){
 		for(int x = 0; x < WINDOW_WIDTH; x++){
-			display[y][x] = window[(wy + y) % 256][(wx + 7 + x) % 256];
-			dprintf("%d ",window[((wy) + y) % 256][(wx + 7 + x) % 256]);
-			if(x % 8 == 0)
-				dprintf("\n");
+			if(window[(wy + y) %256][(wx+7+x) % 256] != 0){
+				display[y][x] = window[(wy + y) % 256][(wx + 7 + x) % 256];
+				dprintf("%d ",window[((wy) + y) % 256][(wx + 7 + x) % 256]);
+				if(x % 8 == 0)
+					dprintf("\n");
+		}
 		}
 			dprintf("-(12) + y = %d\n",((wy) + y) % 256);
 
@@ -69,7 +68,6 @@ uint16_t select_window(){
 }
 
 void set_window(){
-	exit(1);
 	uint8_t data[16];
 	int window_y = 0;
 	int window_x = 0;
@@ -106,7 +104,6 @@ void set_window(){
 		for(int y = 0; y < 8;y++){
 			for(int x = 0; x < 8;x++){
 				window[window_y + y][window_x + x] = tile[y][x];
-				dprintf("d_y : %d\nd_x: %d\n",d_y,d_x);
 			}
 
 		}
@@ -130,4 +127,3 @@ void set_window(){
 
  	window_to_display();
 }
-

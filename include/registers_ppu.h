@@ -13,6 +13,7 @@ uint8_t LCDC_sprite_enable_1();
 uint8_t LCDC_background_window_enable();
 void LCDC_show();
 uint8_t getLY();
+void setLY(uint8_t value);
 void showLY();
 uint8_t getSCY();
 uint8_t getSCX();

@@ -16,10 +16,17 @@
 uint8_t display[WINDOW_HEIGHT][WINDOW_WIDTH] = {0};
 uint8_t background[256][256] = {0};
 uint8_t window[256][256] = {0};
-
 uint8_t tile[8][8] = {0};
+uint8_t tile_line[8] = {0};
 
 int16_t base_ptr;
+unsigned int ppu_t_cycles = 0;
+
+unsigned int ppu_step(unsigned int t_cycles){
+	ppu_t_cycles += t_cycles;
+
+	return ppu_t_cycles;
+}
 
 bool select_addressing_method(){
 	if(LCDC_tile_data_select_4() == 0){
@@ -64,12 +71,11 @@ bool draw(struct Game *g){
 
 	//background_mem += 16;
 
-	if(LCDC_lcd_window_display_enable_5() == 1)
-		set_window();
-
-	set_background();
+	set_window();
+	set_background_ly();
 	background_to_display();
 
+	//if(LCDC_lcd_window_display_enable_5() == 1)
 	
 	//make_tile(test_data);
 
@@ -106,8 +112,8 @@ void render_screen(struct Game *g){
 			//SDL_Color c = dmg_palette[3 - color]; // if you want 0 = lightest, 3 = darkest
 			
 			SDL_Color c = dmg_palette[display[y][x] & 0b11];
-			if(display[y][x] != 0)
-				dprintf("Display colour : %d\nPainting colour : %d\n",display[y][x],display[y][x] & 0b11);
+			//if(display[y][x] != 0)
+				//dprintf("Display colour : %d\nPainting colour : %d\n",display[y][x],display[y][x] & 0b11);
 			SDL_SetRenderDrawColor(g->renderer,c.r,c.g,c.b,c.a);
 
                 	SDL_FRect rect = {x * SCALE, y * SCALE, SCALE, SCALE};

@@ -162,3 +162,9 @@ Then we simply update the tile array.
 			tile[t_y][t_x++] = pixel;
 
 And outside the loop we increment t_y and set t_x to 0.
+
+-----------------------------------------------------------------------------
+2) void set_background_ly():
+
+
+

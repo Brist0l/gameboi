@@ -3,7 +3,6 @@
 #include "memory.h"
 #include "debug.h"
 
-
 uint8_t LCDC_lcd_ppu_enable_bit_7(){
 	dprintf("LCDC Regiser : 0b%08b\n",memory_read(0xff40));
 	return (((memory_read(0xff40)) & 0b10000000) >> 7 );
@@ -44,7 +43,7 @@ uint8_t LCDC_background_window_enable(){
 }
 
 void LCDC_show(){
-	printf("LCDC : 0b%08b\n",memory_read(0xff40));
+	dprintf("LCDC : 0b%08b\n",memory_read(0xff40));
 }
 
 uint8_t getSCY(){
@@ -57,6 +56,10 @@ uint8_t getSCX(){
 
 uint8_t getLY(){
 	return memory_read(0xff44);
+}
+
+void setLY(uint8_t val){
+	memory_write(0xff44,val);
 }
 
 void showLY(){

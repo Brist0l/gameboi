@@ -1061,7 +1061,7 @@ unsigned int execute(){
 		case 0x76:
 			// TODO
 
-			//exit(1);
+			exit(1);
 			break;
 
 		case 0x77:
@@ -1881,6 +1881,7 @@ unsigned int execute(){
 			cpu.IME = 1;
 			opcd_ret();
 			t_cycles += 16;
+			exit(1);
 			break;
 
 		case 0xda:
@@ -2131,7 +2132,6 @@ unsigned int execute(){
 
 		case 0xfb:
 			// EI
-			// TODO
 
 			dprintf("EI\n");
 			cpu.IME = 1;

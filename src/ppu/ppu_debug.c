@@ -9,6 +9,7 @@
 #include "background_debug.h"
 
 #include<stdlib.h>
+#include<unistd.h>
 
 struct Game* g = NULL;
 
@@ -38,24 +39,54 @@ int main(int argc,char* argv[]){
 
 	load_rom("assets/dmg_boot.bin",size,0x0);
 
-	memory[0xff44] = 0x90; //  Just to pass the infinite loop
+	//memory[0xff44] = 0x90; //  Just to pass the infinite loop
 
 	int cnt = 20;
 
-	//_fillregisters();
+	_fillregisters();
 
 	bool runned = false;
-	int c = 0;
-	//game_new(&g);
+
+	unsigned int ly = getLY();
+	unsigned int old_cycle = 0;
 
 	while(runned == false || g->is_running){
 		game_events(g,&key);
-		
-		dprintf("============Executing========\n");
+
 		printf("EXEC\n");
+		old_cycle = t_cycle;
 		t_cycle = execute();
-		dprintf("T Cycles: %d\n",t_cycle);
-	
+		printf("CPU t-cycles: %d\n",t_cycle);
+
+		ppu_t_cycles = ppu_step(t_cycle - old_cycle);
+		printf("PPU t-cycles: %d\n",ppu_t_cycles);
+
+		//if(t_cycle >= 200)
+			//exit(1);
+
+		if(ppu_t_cycles >= 456 && g != NULL){
+			dprintf("Incrementing LY!!\n");
+			printf("DRAW\n");
+			draw(g);
+			printf("RENDER\n");
+			render_screen(g);
+			ly++;
+			setLY(ly);
+			ppu_t_cycles -= 456;
+		}
+
+		if(ly == 154){
+			dprintf("LY is 154!!!\n");
+			ly = 0;
+			setLY(ly);
+		}
+
+		if(ly == 144){
+			uint8_t IF = memory_read(0xff0f);
+			IF |= 0x01;
+			memory_write(0xff0f,IF);
+		}
+
 
 		if(LCDC_lcd_ppu_enable_bit_7() && runned == false){
 			if(background_debug) {
@@ -70,28 +101,19 @@ int main(int argc,char* argv[]){
 			runned = true;
 		}
 
-		//if(cnt-- <= 0 && g != NULL){
-		if(g != NULL && c == 100){
+		if(g != NULL){
 			if(background_debug){
 				printf("DRAW\n");
-				set_debug_background();
+				//set_debug_background();
+				show_background_tiles();
 				printf("RENDER\n");
 				debug_render_screen(g);
 			}
 			else{
-				printf("DRAW\n");
-				draw(g);
-				printf("RENDER\n");
-				render_screen(g);
+			
 			}
-			c = 0;
-			cnt = 20;
-		//}
 		}
 
-		if(g != NULL)
-			c++;
-		
 		LCDC_show();
 		showLY();
 		check_interrupts();
@@ -100,6 +122,7 @@ int main(int argc,char* argv[]){
 
 	//_vramdump();
 	_memorydump(0x9800,0x9c00);
+	_memorydump(0x9c00,0x9fff);
 	//show_background();
 
 	game_free(&g);

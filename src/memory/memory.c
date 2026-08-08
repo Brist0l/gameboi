@@ -96,21 +96,29 @@ void memory_write(uint16_t mem_addr,uint8_t val){
 		serial_io(serial_data);
 	}
 
+	//if(mem_addr ==  0xff44)
+		//sleep(1);
+
 	//if(mem_addr == 0xff0f)
 		//sleep(3);
 
-	//if(mem_addr == 0xff40)
-		//sleep(3);
+	if(mem_addr == 0xff44){
+		dprintf("Accessing LY and putting val : %d!!!\n",val);
+	}
+	if(addr >= 0x9800 && addr <= 0x9BFF)
+	{
+    	printf("VRAM MAP WRITE %04X <- %02X\n", addr, val);
+}
 
 
 	memory[mem_addr] = val;
 }
 
 uint8_t memory_read(uint16_t mem_addr){
-	if(mem_addr == 0xff44){
+	//if(mem_addr == 0xff44){
 	    //printf("READ %04x\n",mem_addr);
-	    return 0x90;
-	}
+	    //return 0x90;
+	//}
 
 	return memory[mem_addr];
 }

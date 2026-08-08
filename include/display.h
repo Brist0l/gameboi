@@ -10,7 +10,7 @@
 #define WINDOW_WIDTH 160
 #define WINDOW_HEIGHT 144
 #define SCALE 8
-#define BACKGROUND_SCALE 4
+#define BACKGROUND_SCALE 5
 
 struct Game{
 	SDL_Window *window;

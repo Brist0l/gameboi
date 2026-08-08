@@ -3,6 +3,7 @@
 #include "memory.h"
 
 #include <stdlib.h>
+#include <unistd.h>
 
 void check_interrupts(){
 	if(cpu.IME == 1){
@@ -22,11 +23,14 @@ void check_interrupts(){
 		dprintf("The IE flag is 0x%08b\n",IE);
 		dprintf("The IF flag is 0x%08b\n",IF);
 
-		if(IF != 0)
-			exit(1);
+		if(IF != 0){
+			dprintf("IF isn't 0\n");
+		}
 
 		if(IE & IF){
 			if((IE & 1) & (IF & 1)){
+				printf("V-BLANKS\n");
+				sleep(3);
 				// V-BLANK
 
 			}

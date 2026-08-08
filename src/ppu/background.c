@@ -8,6 +8,7 @@
 
 static uint16_t background_mem = 0x9800;
 static uint16_t background_mem_end;
+uint16_t start_addr;
 
 void show_background(){
 	for(int y = 0; y < 256;y++){
@@ -46,7 +47,7 @@ void background_to_display(){
 				//dprintf("\n");
 		}
 	}
-		
+
 	dprintf("\n");
 	logmsg("background_to_display",false);
 
@@ -78,7 +79,7 @@ void set_background(){
 	// background_mem_end
 	background_mem_end = select_background();
 
-	while(background_mem_end > background_mem){
+	while(background_mem_end >= background_mem){
 		// Assume that you have a tile number 0.
 		// So that means that it would start at
 		// 0x8000 and then it would read 16 bytes
@@ -93,7 +94,7 @@ void set_background(){
 		else
 			start_addr = base_ptr + (16 * (int8_t)((memory_read(background_mem))));
 
-		background_mem++; // Index to the next tile 
+		background_mem++; // Index to the next tile
 
 		for(int i = 0; i < 16; i++)
 			data[i] = memory_read(start_addr + i);
@@ -101,14 +102,19 @@ void set_background(){
 		make_tile(data); // form the data into a tile
 
 
-		// Set the background as the tile
-		for(int y = 0; y < 8;y++){
-			for(int x = 0; x < 8;x++){
-				background[background_y + y][background_x + x] = tile[y][x];
-				//dprintf("d_y : %d\nd_x: %d\n",d_y,d_x);
-			}
+		// LY renderer
+		for(int x = 0; x < 8;x++)
+			background[getLY()][background_x + x] = tile[getLY() % 8][x];
 
-		}
+
+		// Set the background as the tile
+		//for(int y = 0; y < 8;y++){
+			//for(int x = 0; x < 8;x++){
+			//background[background_y + y][background_x + x] = tile[y][x];
+				//dprintf("d_y : %d\nd_x: %d\n",d_y,d_x);
+			//}
+
+		//}
 
 		background_x += 8;
 
@@ -129,3 +135,65 @@ void set_background(){
 
 }
 
+void set_background_ly(){
+	// You just need to render 1 line , hence you keep on reading the first
+	// 32 tiles only until LY is 8 , then the next 32 tiles
+	// Always base them on LY.
+	//
+	// Hence I have got the rows using LY % 8.
+	//
+	// Ly == 0
+	// then I will get the 0th row
+	// if LY == 1
+	// Then I will get the 1st row
+	//
+	// If LY == 7
+	// Then I will get the 7th row
+	//
+	// If LY == 8
+	// Then I will get the 0th row
+	//
+	// But now t
+
+	uint8_t data[2];
+	int background_x = 0;
+
+	int tiles = 0;
+
+	while(tiles != 32){
+		background_mem_end = select_background();
+		background_mem += (((getLY()/8) * 32) + tiles); // Index to the next tile
+
+		if(select_addressing_method() == 1)
+			start_addr = base_ptr + (16 * (uint8_t)((memory_read(background_mem))));
+		else
+			start_addr = base_ptr + (16 * (int8_t)((memory_read(background_mem))));
+
+		printf("start addr = %x\n", start_addr);
+		printf("base ptr = %x\n", base_ptr);
+		printf("memory_read's on background = %x\n",(uint8_t)((memory_read(background_mem))));
+		printf("index of background = %x\n",16 * (uint8_t)((memory_read(background_mem))));
+		printf("background_mem = %x\n", background_mem);
+		printf("end mem = %x\n", background_mem_end);
+		printf("row  = %d\n", getLY() % 8);
+
+		for(int i = 0; i < 2; i++)
+			data[i] = memory_read(start_addr + i + ((getLY() % 8)*2));
+
+		make_tile_line(data); // form the data into a tile
+
+		printf("%d -> ",getLY());
+
+		for(int tile_x = 0; tile_x < 8;tile_x++){
+			background[getLY()][tile_x + background_x] = tile_line[tile_x];
+			printf("%b ",tile_line[tile_x]);
+		}
+		printf("\n");
+
+		background_x += 8;
+		printf("background_x = %d\n", background_x);
+
+		tiles++;
+
+	}
+}

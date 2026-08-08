@@ -1,0 +1,22 @@
+It's the Object Attribute Memory.
+It ranges from 0xFE00-0xFE9F and it's used to display sprites on the screen.
+
+To represent 1 sprite we use 4 bytes, the bytes are used to represent: 
+
+Byte 0 => It's the Y position of the sprite , 16 is subtracted from it
+Byte 1 => It's the X position of the sprite , 8  is subtracted from it
+Byte 2 => It's the Tile number and uses 8000 addressing method
+Byte 3 => It's the sprite flag
+
+	Bit 7    OBJ-to-BG Priority
+		  0 = Sprite is always rendered above background
+		  1 = Background colors 1-3 overlay sprite, sprite is still rendered above color 0
+	Bit 6    Y-Flip
+		  If set to 1 the sprite is flipped vertically, otherwise rendered as normal
+	Bit 5    X-Flip
+		  If set to 1 the sprite is flipped horizontally, otherwise rendered as normal
+	Bit 4    Palette Number
+		  If set to 0, the OBP0 register is used as the palette, otherwise OBP1
+	Bit 3-0  CGB-Only flags
+
+
